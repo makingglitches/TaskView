@@ -1,0 +1,34 @@
+extends layout
+
+block content
+  
+  script(src="/javascripts/indexscript.js", type="text/javascript")
+  // probably not reproduced exactly but pretty fucking close. nothing better to do at this point.
+  
+  // plan for a grid container with 3 items
+  // one is a clear icon.
+  // another is an up down icon which transitions
+  // another is a number that is at maximum the number of selected columns for sort
+  // all these appearing to the right of the text inline and sized appropriately
+  // user clicks the up or down arrow and it sorts ascending or descending
+  // icon turns pure white when selected
+  // icon is black bordered in white when inactive
+  // number is white on a black background and disappears, AGAIN when not selected.
+  // each click results in javascript event modifying a global variable in indexscripts.js which contains
+  // sort filters.
+  // plan also for a drilldown view as well with subgrids reexploring css3 grid functionality sitting
+  // in the same fucking place.
+  // oh and if 'I' appreciates anything its usually bad news for "U"/Loki/John R Sohn
+  // as usual.
+  div(class="grid-container", id="taskcontainer")
+    div(class="cellheader", id='projhead') Project 
+      img(src="/images/inactive arrow.png", alt="up arrow")
+    div(class="cellheader", id='idhead') Id
+    div(class="cellheader", id="deschead") Description
+    div(class="cellheader", id="statushead") Status
+    div(class="cellheader", id="priorityhead") Priority
+
+  // THE . AT THE END OF SCRIPT MAKES THE DIFFERENCE BETWEEN WHETHER THIS RESULTS IN AN ERROR OR RUNS
+  // APPARENTLY IT INDICATES THAT YOU'RE USING THE SCRIPT TAG INSTEAD OF A JADE FUNCTION
+  img(src="/images/ajax-loader.gif", alt="noimage",class="loading")
+   

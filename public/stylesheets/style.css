@@ -1,0 +1,64 @@
+body {
+  padding: 50px;
+  background-color: black;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  color:white; 
+}
+
+a {
+  color: #00B7FF;
+}
+
+.loading {
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+}
+.grid-container {
+  display: grid;
+  grid-template-rows:max-content;
+  grid-gap: 3px;
+  grid-template-columns: 80px 120px 300px 120px 120px;
+  
+}
+
+
+.cellheader {
+  color:yellow;
+  padding:5px;
+  text-align: center;
+  font-size:1.5em;
+  border-radius: 10px;
+  border-color: white;
+  border-style: solid;
+  padding-bottom: 5px;
+}
+
+
+.invertrotate
+{
+  transform:rotate(180deg);
+}
+
+.arrowactive
+{
+  filter: invert(100)
+}
+
+.dataitem
+{
+
+  border-color: white;
+  border-style: dashed;
+  padding: 5px;
+}
+
+.resizeimage
+{
+ width:20px;
+ height:auto;
+ vertical-align: middle;
+ padding-left: 20px;
+ padding-right: 10px;
+}
