@@ -40,6 +40,60 @@ function setContainerProps(containerId)
 
   $('#'+containerId).attr('style',sizestring);
 }
+
+
+
+function setButtonsFromFilters(filter)
+{
+
+  // after a grid refresh all the damn buttons may be missing that
+  // were created by a click event
+  if (filter.Direction != SortOptions.None)
+  {
+
+    if ( $('#'+filter.OrderButtonName).length==0)
+    {
+      
+      $('<span>')
+      .attr('id',filter.OrderButtonName)
+      .attr('data-col',id)
+      .appendTo('#'+filter.HeaderDivName);
+
+      $('#'+filter.OrderButtonName).click(function()
+      {
+        var id =  $(this).attr('data-col');
+        updateOrder(id);
+      });
+
+    }
+
+    $('#'+filter.SortButtonName).addClass('arrowactive');    
+
+  }
+
+  // apply display logic.
+  switch(filter.Direction)
+  {
+    case SortOptions.Up:
+      // add sort priority control next to sort arrow
+      
+      // transform icon to active and turn right side up to indicate ascending order sort
+      $('#'+filter.SortButtonName).addClass('invertrotate');
+    break;
+
+    case SortOptions.Down:
+      $('#'+filter.SortButtonName).removeClass('invertrotate');  
+    break;
+
+    case SortOptions.None:
+      //revert sort arrow to original appearance
+      $('#'+filter.SortButtonName).removeClass('arrowactive');
+      // remove sort priority control
+      $('#'+filter.OrderButtonName).remove();
+    break;
+  }
+
+}
  
 
 // sets up the grid and populates it with data from getTasks() call
@@ -99,41 +153,20 @@ function setGrid(data)
            case SortOptions.None:
              f.Direction = SortOptions.Up;
              f.Priority = getMaxPriority()+1;
-
-             // add sort priority control next to sort arrow
-             $('<span>')
-             .attr('id',id+'order')
-             .attr('data-col',id)
-             .appendTo('#'+f.HeaderDivName);
-      
-             $('#'+f.OrderButtonName).click(function()
-             {
-                var id =  $(this).attr('data-col');
-                updateOrder(id);
-             });
-
-             // transform icon to active and turn right side up to indicate ascending order sort
-             $(this).addClass('invertrotate arrowactive');
              break;
 
            case SortOptions.Up:
              Filters[id].Direction = SortOptions.Down;
-             
              // transform icon to turn downwards to indicate descending order
-             $(this).removeClass('invertrotate');
              break;
 
            case SortOptions.Down:
              Filters[id].Direction = SortOptions.None;
              removeOrder(id);
-
-             //revert sort arrow to original appearance
-             $(this).removeClass('arrowactive');
-             // remove sort priority control
-             $('#'+f.OrderButtonName).remove();
              break;
          }
 
+         setButtonsFromFilters(f);
          refreshOrders();
 
       });
@@ -199,6 +232,14 @@ function setGrid(data)
       column=nextColumns();
      }
   }
+
+  //reset button state from filters
+  for (id in Filters)
+  {
+    setButtonsFromFilters(Filters[id]);
+  }
+
+  refreshOrders();
 
 }
 

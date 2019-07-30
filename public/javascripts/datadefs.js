@@ -1,3 +1,4 @@
+
 var columns = [
     {	Header:	'Id'	,	DataId:	'id'	,	Width:	80	,	Handler:	''},
   {	Header:	'Project'	,	DataId:	'project'	,	Width:	120	,	Handler:	''},
@@ -44,6 +45,7 @@ while ( c!=null)
           Direction:SortOptions.None, 
           Priority:0, 
           id:c.Header,
+          Column:c,
           OrderButtonName:c.Header+"order",
           SortButtonName:c.Header+"sort",
           HeaderDivName : c.Header+"head"
@@ -56,3 +58,68 @@ while ( c!=null)
         c=nextColumns();
 }
 
+
+function Resort()
+{
+  var sortpath = [];
+
+  for (filterId in Filters)
+  {
+    var f = Filters[filterId];
+
+    if ( f.Direction != SortOptions.None)
+    {
+        sortpath.push({id:f.Column.DataId, dir:f.Direction,pr:f.Priority});
+    }
+  }
+
+  if (sortpath.length > 0)
+  {
+    sortpath.sort(function(a,b)
+    {
+        if (a.pr > b.pr )
+        { 
+          return 1;
+        }
+        else if (a.pr < b.pr)
+        {
+          return -1;
+        }
+        else return 0;
+    });
+
+    var sortfunctioncode = 
+    `function gridSort(data)
+    {
+      data.sort(function(d1,d2)
+      {
+
+      `;
+
+      for (o of sortpath)
+      {
+        
+         sortfunctioncode+=
+                "if (d1['"+o.id+"']" 
+                + (o.dir == SortOptions.Up?'>':'<')+" d2['"+o.id+"']) { return 1;} "
+                +"if (d1['"+o.id+"']" 
+                + (o.dir == SortOptions.Up?'<':'>')+" d2['"+o.id+"']) { return -1;} ";
+      }
+
+      sortfunctioncode+=` return 0;
+        });
+      }`;
+    
+  }
+  else
+  {
+    var sortfunctioncode='function gridSort(data) { console.log("empty search filters");}';
+  }
+
+  eval(sortfunctioncode);
+
+  gridSort(globData);
+
+  console.log(sortfunctioncode);
+  console.log(sortpath);
+}
