@@ -1,4 +1,5 @@
 
+// make sure to include datadefs in html document
 var globData=[];
 
 $(document).ready(function(err)
@@ -12,24 +13,34 @@ $(document).resize(function()
 });
 
 
-var sortoptions = {Up:1,Down:2,None:0}
-var initial =1;
-var filters = {};
-var datamappings = [];
 
-var columns = [
-  {	Header:	'Id'	,	DataId:	'id'	,	Width:	80	,	Handler:	''},
-  {	Header:	'Project'	,	DataId:	'project'	,	Width:	120	,	Handler:	''},
-  {	Header:	'Description'	,	DataId:	'description'	,	Width:	300	,	Handler:	'},
-  {	Header:	'Status'	,	DataId:	'status'	,	Width:	120	,	Handler:	''},
-  {	Header:	'Priority'	,	DataId:	'urgency'	,	Width:	120	,	Handler:	'Priority'},
-  {	Header:	'Tags'	,	DataId:	'Tags'	,	Width:	200	,	Handler:	'Tag'}
-]
-  
 
-var headers = ['Id','Project','Description','Status','Priority','Tags'];
-var toget = ['id','project','description','status','urgency','tags'];
+// flag indicating filters have not been set up yet.
+//var initial =1;
 
+
+
+// sets the grid container properties
+function setContainerProps(containerId)
+{
+
+  resetColumns();
+
+  var c = nextColumns();
+
+  var sizestring = "grid-template-columns: ";
+
+  while (c!=null)
+  {
+    sizestring+=c.Width+"px ";
+    c=nextColumns();
+  }
+
+  sizestring+=";"
+
+  $('#'+containerId).attr('style',sizestring);
+}
+ 
 
 // sets up the grid and populates it with data from getTasks() call
 function setGrid(data)
@@ -38,68 +49,64 @@ function setGrid(data)
 
   datamappings = [];
 
+  // clear data and header rows
   t.children().remove('div');
 
-  
- // t.attr('style','grid-template-columns:repeat('+headers.length+', minmax(100px, 1fr));'  );
+  setContainerProps('taskcontainer');
 
   // set up headers and links
-  for (i in headers)
-  {
-    var item = headers[i];
 
+  resetColumns();
+
+  var column =nextColumns();
+  
+
+  while (column!=null)
+  {
+    var item =column.Header;
+    
     // for later use TODO: move this to another area in initialization code or make it a constant
 
-    datamappings.push({HeaderId:item,DataId:""});
-      
     // add cell header div
       $('<div/>')
-      .attr('id',item+'head')
+      .attr('id',column.HeaderDivName)
       .addClass('cellheader')
       .html(item)
       .appendTo(t);
-
+ 
+      $('<br>').appendTo('#'+column.HeaderDivName);
 
       // add sort icon next to header text
       $('<img>')
       .addClass('resizeimage')
-      .attr('id',item+'sort')
+      .attr('id',column.SortButtonName)
       .attr('src','images/inactive arrow.png')
       .attr('data-col',item)
-      .appendTo('#'+item+'head');
-
-
-      // populate the sort filters
-      // dictionary of objects containing two options, priority and direction
-      // down is decending
-      // up is ascending
-      // priority is sort order
-      // default sort to id for consistency
-      if (initial==1)
-      {
-        filters[item] = {Direction:sortoptions.None, Priority:0, id:item};
-      }
+      .appendTo('#'+column.HeaderDivName);
 
       // add click event handler to sort arrow icon next to header
-      $('#'+item+'sort').click(function()
+      $('#'+column.SortButtonName).click(function()
       {
         // retrieve the id from the data-col attribute
          var id =  $(this).attr('data-col');
          console.log('id discovered was'+ id);
 
-         switch(filters[id].Direction)
+         var f = Filters[id];
+
+         switch(f.Direction)
          {
-           case sortoptions.None:
-             filters[id].Direction = sortoptions.Up;
-             filters[id].Priority = getMaxPriority()+1;
+           
+           case SortOptions.None:
+             f.Direction = SortOptions.Up;
+             f.Priority = getMaxPriority()+1;
 
              // add sort priority control next to sort arrow
              $('<span>')
              .attr('id',id+'order')
              .attr('data-col',id)
-             .appendTo('#'+id+"head");
+             .appendTo('#'+f.HeaderDivName);
       
-             $('#'+id+'order').click(function()
+             $('#'+f.OrderButtonName).click(function()
              {
                 var id =  $(this).attr('data-col');
                 updateOrder(id);
@@ -109,21 +116,21 @@ function setGrid(data)
              $(this).addClass('invertrotate arrowactive');
              break;
 
-           case sortoptions.Up:
-             filters[id].Direction = sortoptions.Down;
+           case SortOptions.Up:
+             Filters[id].Direction = SortOptions.Down;
              
              // transform icon to turn downwards to indicate descending order
              $(this).removeClass('invertrotate');
              break;
 
-           case sortoptions.Down:
-             filters[id].Direction = sortoptions.None;
+           case SortOptions.Down:
+             Filters[id].Direction = SortOptions.None;
              removeOrder(id);
 
              //revert sort arrow to original appearance
              $(this).removeClass('arrowactive');
              // remove sort priority control
-             $('#'+id+'order').remove();
+             $('#'+f.OrderButtonName).remove();
              break;
          }
 
@@ -131,48 +138,80 @@ function setGrid(data)
 
       });
     
+      column=nextColumns();
   }
 
-    // part of initialization code to be moved TODO: remove this later
-  var i =0;
-
-  for (id in toget)
-  {
-      var dataid = toget[id];
-      datamappings[i].DataId=dataid;
-      i++;
-  }
 
   // populate grid with provided data
-  for (id in data)
+  for (item of data)
   {
-     var item = data[id]
+   //  var item = data[id]
 
-     for (idnum in toget)
+     resetColumns();
+     var column= nextColumns();
+     
+     while (column!=null)
      {
-       var dataid = toget[idnum];
 
+      var datapiece ="";
+
+      switch(column.Handler)
+      {
+        case 'Priority':
+          switch(item[column.DataId])
+          {
+            case 'L':
+              datapiece="Low";
+              break;
+            case 'M':
+              datapiece="Medium";
+              break;
+            case 'H':
+              datapiece="High";
+              break;
+            default:
+              datapiece=" ";
+              break;
+            }
+          break;
+
+        case 'Tag':
+          if (typeof item[column.DataId] != "undefined")
+          {
+            for (tag of item[column.DataId])
+            {
+              datapiece+='+'+tag+" ";
+            }
+          }
+          break;
+
+        default:
+            datapiece=item[column.DataId];
+          break;
+      }
+      
       $('<div>')
       .attr('data-uuid',item.uuid)
-      .html(item[dataid])
+      .html(datapiece)
       .addClass('dataitem')
       .appendTo(t);
 
-      i++;
+      column=nextColumns();
      }
   }
 
-    initial=0;
 }
 
 
 function refreshOrders()
 {
-  for (i in filters)
+  for (filterId in Filters)
   {
-    if (filters[i].Priority >0)
+    var f = Filters[filterId];
+
+    if (f.Priority >0)
     {
-      $('#'+i+'order').text(filters[i].Priority);
+      $('#'+f.OrderButtonName).text(f.Priority);
     }
   }
 }
@@ -180,16 +219,18 @@ function refreshOrders()
 // for when an update needs forced, like after turning off sorting on a column
 function removeOrder(Id)
 {
-  var ori = filters[Id].Priority;
+  var ori = Filters[Id].Priority;
 
-  filters[Id].Priority=0;
+  Filters[Id].Priority=0;
 
-  for (i in filters)
+  for (filterId in Filters)
   {
-    if (filters[i].Priority > ori)
+    f = Filters[filterId];
+
+    if (f.Priority > ori)
     {
       // shift the items after the previous priority back by one.
-      filters[i].Priority--;
+        f.Priority--;
     }
   }
 
@@ -207,7 +248,7 @@ function updateOrder(Id)
   var max = getMaxPriority();
 
   // get the current items priority
-  var ori = filters[Id].Priority;
+  var ori = Filters[Id].Priority;
 
   console.log('max is '+max);
   console.log('original priority is '+ori);
@@ -216,11 +257,11 @@ function updateOrder(Id)
 
   if (ori==max)
   {
-    filters[Id].Priority=1;
+    Filters[Id].Priority=1;
   }
   else
   {
-    filters[Id].Priority++;
+    Filters[Id].Priority++;
   }
 
 
@@ -228,12 +269,12 @@ function updateOrder(Id)
 
   if (ori ==  max)
   {
-    for (id in filters)
+    for (filterId in Filters)
     {
       // skip the selected item otherwise increment priority
-      if (id != Id)
+      if (filterId != Id)
       {
-        filters[id].Priority++;
+        Filters[filterId].Priority++;
       }               
     }
   }
@@ -241,11 +282,11 @@ function updateOrder(Id)
   {
     // use case for a priority which was in the middle somewhere
   
-    for (id in filters)
+    for (filterId in Filters)
     {
-      var item = filters[id];
+      var item = Filters[filterId];
 
-      if (item.Priority !=0 && id !=Id)
+      if (item.Priority !=0 && filterId !=Id)
       {
           if (item.Priority == max)
           {
@@ -268,11 +309,11 @@ function getMaxPriority()
 
   var prior=0;
 
-  for (id in filters)
+  for (id in Filters)
   {
-    if (filters[id].Priority > prior)
+    if (Filters[id].Priority > prior)
     {
-      prior = filters[id].Priority;
+      prior = Filters[id].Priority;
     }
   }
 
