@@ -3,8 +3,16 @@ extends layout
 block content
   
   script(src="/javascripts/indexscript.js", type="text/javascript")
+
+  div(id="coverdiv", class='coverpanel', style='display:none')
+  div(id='contextmenudiv',style='z-index:199;display:none;width:200:height:auto;background-color:gray;text-color:black')
+    div Edit
+    div Filter
+    div Delete Row
+    div View Metadata 
+  div(id='filterdialog', style='display:none')
+    div Apply Filter
   // probably not reproduced exactly but pretty fucking close. nothing better to do at this point.
-  
   // plan for a grid container with 3 items
   // one is a clear icon.
   // another is an up down icon which transitions
@@ -21,14 +29,8 @@ block content
   // oh and if 'I' appreciates anything its usually bad news for "U"/Loki/John R Sohn
   // as usual.
   div(class="grid-container", id="taskcontainer")
-    div(class="cellheader", id='projhead') Project 
-      img(src="/images/inactive arrow.png", alt="up arrow")
-    div(class="cellheader", id='idhead') Id
-    div(class="cellheader", id="deschead") Description
-    div(class="cellheader", id="statushead") Status
-    div(class="cellheader", id="priorityhead") Priority
-
+    
   // THE . AT THE END OF SCRIPT MAKES THE DIFFERENCE BETWEEN WHETHER THIS RESULTS IN AN ERROR OR RUNS
   // APPARENTLY IT INDICATES THAT YOU'RE USING THE SCRIPT TAG INSTEAD OF A JADE FUNCTION
-  img(src="/images/ajax-loader.gif", alt="noimage",class="loading")
+  img(id='spinner',src="/images/ajax-loader.gif", alt="noimage",class="loading",style="display:none")
    

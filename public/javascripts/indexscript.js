@@ -12,7 +12,19 @@ $(document).resize(function()
 
 });
 
-
+function showLoad(on)
+{
+    if (on)
+    {     
+      $('#spinner').show();
+      $('#taskcontainer').hide();
+    }
+    else
+    {
+      $('#spinner').hide();
+      $('#taskcontainer').show();
+    }
+}
 
 
 // flag indicating filters have not been set up yet.
@@ -63,7 +75,11 @@ function setButtonsFromFilters(filter)
       {
         var id =  $(this).attr('data-col');
         updateOrder(id);
+        Resort();
+        setGrid(globData);
       });
+
+
 
     }
 
@@ -136,6 +152,7 @@ function setGrid(data)
       .attr('id',column.SortButtonName)
       .attr('src','images/inactive arrow.png')
       .attr('data-col',item)
+      .attr('data-dataid',column.DataId)
       .appendTo('#'+column.HeaderDivName);
 
       // add click event handler to sort arrow icon next to header
@@ -167,7 +184,9 @@ function setGrid(data)
          }
 
          setButtonsFromFilters(f);
-         refreshOrders();
+         refreshSortPriorities();
+         Resort();
+         setGrid(globData);
 
       });
     
@@ -239,12 +258,12 @@ function setGrid(data)
     setButtonsFromFilters(Filters[id]);
   }
 
-  refreshOrders();
+  refreshSortPriorities();
 
 }
 
 
-function refreshOrders()
+function refreshSortPriorities()
 {
   for (filterId in Filters)
   {
@@ -341,7 +360,7 @@ function updateOrder(Id)
     }
   }
 
-  refreshOrders();
+  refreshSortPriorities();
 }
 
 
