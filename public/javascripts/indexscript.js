@@ -244,12 +244,32 @@ function setGrid(data)
       
       $('<div>')
       .attr('data-uuid',item.uuid)
+      .attr('data-id',column.Header)
       .html(datapiece)
       .addClass('dataitem')
       .appendTo(t);
 
+
+
       column=nextColumns();
      }
+
+     $('.dataitem').dblclick(function()
+     {
+       var id = $(this).attr('data-id');
+       var uuid = $(this).attr('data-uuid');
+       
+       var column = Filters[id].Column;
+       
+       if ( column.Editable )
+       {
+         
+       }
+     });
+
+
+
+
   }
 
   //reset button state from filters

@@ -6,13 +6,71 @@ var Filters = {};
 
 const HandlerOptions = { Priority:"Priority", Tags:"Tags"}
 
+const EditorType = { 
+                      TextArea:"TextArea",
+                      TagEditor:"TagEditor",
+                      ProjectSelector:"DDLProject",
+                      StatusDDL:"StatusDDL",
+                      PriorityDDL:"DDLPriority" 
+                    }
+
 var columns = [
-    {	Header:	'Id'	,	DataId:	'id'	,	Width:	80	,	Handler:	'', Editable:false},
-  {	Header:	'Project'	,	DataId:	'project'	,	Width:	120	,	Handler:	'', Editable:false},
-  {	Header:	'Description'	,	DataId:	'description'	,	Width:	300	,	Handler:	'', Editable:false},
-  {	Header:	'Status'	,	DataId:	'status'	,	Width:	120	,	Handler:	'', Editable:false},
-  {	Header:	'Priority'	,	DataId:	'priority'	,	Width:	120	,	Handler:HandlerOptions.Priority, Editable:false	},
-  {	Header:	'Tags'	,	DataId:	'tags'	,	Width:	200	,	Handler:	HandlerOptions.Tags, Editable:false}
+    {	
+      Header:	'Id'	,	
+      DataId:	'id'	,	
+      Width:	80	,	
+      Handler:	'', 
+      Editable:false},
+
+    {	
+      Header:	'Project'	,	
+      DataId:	'project'	,	
+      Width:	120	,	
+      Handler:	'', 
+      Editable:true,
+      UpdateCommand:'task $i modify project:$1',
+      Editor:EditorType.ProjectSelector
+    },
+   
+    {	
+      Header:	'Description'	,	
+      DataId:	'description'	,	
+      Width:	300	,	
+      Handler:	'', 
+      Editable:true, 
+      UpdateCommand:'task $i modify $1',
+      Editor:EditorType.TextArea
+    },
+    // use-case not covered by one command for updatecommand, again.
+    // possibly make this a function call also accepting one atomic operation
+    {	
+      Header:	'Status'	,	
+      DataId:	'status'	,	
+      Width:	120	,	
+      Handler:	'', 
+      Editable:true,
+      UpdateCommand:'task $i modify status:$1',
+      Editor:EditorType.StatusDDL
+    },
+    
+    {
+      Header:	'Priority'	,	
+      DataId:	'priority'	,	
+      Width:	120	,	
+      Handler:HandlerOptions.Priority, 
+      Editable:true,
+      Editor:EditorType.PriorityDDL
+    },
+
+    {	
+      Header:	'Tags'	,	
+      DataId:	'tags'	,	
+      Width:	200	,	
+      Handler:	HandlerOptions.Tags, 
+      Editable:false,
+      Editor:EditorType.TagEditor,
+      UpdateCommand:''
+    }
 ];
 
 var _column_curr_index = 0;
