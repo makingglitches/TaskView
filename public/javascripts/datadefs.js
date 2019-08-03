@@ -2,7 +2,6 @@
 // convenience object for setting SortOrder field of filter object
 const SortOptions = {Up:1,Down:2,None:0}
 // display, search and sort filters
-var Filters = {};
 
 const HandlerOptions = { Priority:"Priority", Tags:"Tags"}
 
@@ -73,6 +72,42 @@ var columns = [
     }
 ];
 
+var Filters = initFilters();
+
+function initFilters()
+{
+
+  var filters={};
+
+  resetColumns();
+
+  var c = nextColumns();
+
+  // some initialization code for search filters
+  while ( c!=null)
+  {
+        filters[c.Header]= 
+        {
+          Direction:SortOptions.None, 
+          Priority:0, 
+          id:c.Header,
+          Column:c,
+          OrderButtonName:c.Header+"order",
+          SortButtonName:c.Header+"sort",
+          HeaderDivName : c.Header+"head"
+        };
+        
+        c.SortButtonName = filters[c.Header].SortButtonName;
+        c.OrderButtonName = filters[c.Header].OrderButtonName;
+        c.HeaderDivName = c.Header+"head";
+
+        c=nextColumns();
+  }
+
+  return filters;
+
+}
+
 var _column_curr_index = 0;
 
 function resetColumns()
@@ -92,32 +127,6 @@ function  nextColumns()
         return columns[_column_curr_index-1];
     }
 }
-
-resetColumns();
-
-var c = nextColumns();
-
-// some initialization code for search filters
-while ( c!=null)
-{
-        Filters[c.Header]= 
-        {
-          Direction:SortOptions.None, 
-          Priority:0, 
-          id:c.Header,
-          Column:c,
-          OrderButtonName:c.Header+"order",
-          SortButtonName:c.Header+"sort",
-          HeaderDivName : c.Header+"head"
-        };
-        
-        c.SortButtonName = Filters[c.Header].SortButtonName;
-        c.OrderButtonName = Filters[c.Header].OrderButtonName;
-        c.HeaderDivName = c.Header+"head";
-
-        c=nextColumns();
-}
-
 
 function Resort()
 {
@@ -215,4 +224,42 @@ function Resort()
   gridSort(globData);
 
   console.log(sortpath);
+}
+
+var ByUUID={};
+
+function testindex(data)
+{
+  var uuidindex={};
+
+  for (i in data )
+  {
+    uuidindex[data[i].uuid]=data[i];
+  }
+
+  return uuidindex;
+}
+
+function getTasks(setGrid)
+{
+
+  var jqxhr = $.getJSON( "/users/getTasks", 
+    function(data) 
+    {
+      console.log( "success" );
+      globData=data;
+      setGrid(data);
+      ByUUID=testindex(globData);
+    })
+  .done(function() 
+  {
+      console.log( "second success" );
+  })
+  .fail(function() {
+    console.log( "error" );
+  })
+  .always(function() {
+    console.log( "complete" );
+  });
+  
 }

@@ -4,7 +4,7 @@ var globData=[];
 
 $(document).ready(function(err)
 {
-    getTasks();
+    getTasks(setGrid);
 });
 
 $(document).resize(function()
@@ -258,12 +258,17 @@ function setGrid(data)
      {
        var id = $(this).attr('data-id');
        var uuid = $(this).attr('data-uuid');
-       
+      
+     
+      
        var column = Filters[id].Column;
        
        if ( column.Editable )
        {
-         
+        ('<textarea')
+        .attr('id',id+'editor')
+        .attr('style','width:100%;height:100%')
+        .val()    
        }
      });
 
@@ -401,25 +406,3 @@ function getMaxPriority()
   return prior;
 }
 
-function getTasks()
-{
-
-  var jqxhr = $.getJSON( "/users/getTasks", 
-    function(data) 
-    {
-      console.log( "success" );
-      globData=data;
-      setGrid(data);
-    })
-  .done(function() 
-  {
-      console.log( "second success" );
-  })
-  .fail(function() {
-    console.log( "error" );
-  })
-  .always(function() {
-    console.log( "complete" );
-  });
-  
-}
