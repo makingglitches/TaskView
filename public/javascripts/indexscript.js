@@ -177,6 +177,7 @@ function setGrid(data)
               .attr('data-uuid',item.uuid)
               .attr('data-tag',tag)
               .attr('margin-left',5)
+              .addClass('tagitem')
               .html('+'+tag);
           
               var taghtml = newtag.prop('outerHTML');
@@ -224,10 +225,6 @@ function setGrid(data)
         .prop('outerHTML');    
        }
      });
-
-
-
-
   }
 
   //reset button state from filters

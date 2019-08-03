@@ -90,6 +90,11 @@ function Resort()
         sortfunctioncode+=' typeof '+symbol2+' == "undefined") { return '+
         (o.dir == SortOptions.Up?'-':' ')+ "1;}";
 
+        sortfunctioncode+='if (typeof '+symbol1+' == "undefined" &&';
+   
+        sortfunctioncode+=' typeof '+symbol2+' == "undefined") { return '+
+         "0;}";
+
         
         if (o.filter.Column.Handler== HandlerOptions.Tags)
         {
