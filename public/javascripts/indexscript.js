@@ -53,8 +53,6 @@ function setContainerProps(containerId)
   $('#'+containerId).attr('style',sizestring);
 }
 
-
-
 function setButtonsFromFilters(filter)
 {
 
@@ -74,12 +72,10 @@ function setButtonsFromFilters(filter)
       $('#'+filter.OrderButtonName).click(function()
       {
         var id =  $(this).attr('data-col');
-        updateOrder(id);
+        updateSortPriorities(id);
         Resort();
         setGrid(globData);
       });
-
-
 
     }
 
@@ -117,82 +113,26 @@ function setGrid(data)
 {
   var t = $('#taskcontainer');
 
-  datamappings = [];
-
   // clear data and header rows
   t.children().remove('div');
 
   setContainerProps('taskcontainer');
 
   // set up headers and links
-
   resetColumns();
-
   var column =nextColumns();
   
-
   while (column!=null)
-  {
-    var item =column.Header;
-    
-    // for later use TODO: move this to another area in initialization code or make it a constant
-
-    // add cell header div
-      $('<div/>')
-      .attr('id',column.HeaderDivName)
-      .addClass('cellheader')
-      .html(item)
-      .appendTo(t);
- 
-      $('<br>').appendTo('#'+column.HeaderDivName);
-
-      // add sort icon next to header text
-      $('<img>')
-      .addClass('resizeimage')
-      .attr('id',column.SortButtonName)
-      .attr('src','images/inactive arrow.png')
-      .attr('data-col',item)
-      .attr('data-dataid',column.DataId)
-      .appendTo('#'+column.HeaderDivName);
-
+  {    
+      addColumnHeader(column,t);
+      addLineBreak($('#'+column.HeaderDivName));
+      addSortIcon(column,'#'+column.HeaderDivName);
+      
       // add click event handler to sort arrow icon next to header
-      $('#'+column.SortButtonName).click(function()
-      {
-        // retrieve the id from the data-col attribute
-         var id =  $(this).attr('data-col');
-         console.log('id discovered was'+ id);
+      $('#'+column.SortButtonName).click(sortButtonClick);
 
-         var f = Filters[id];
-
-         switch(f.Direction)
-         {
-           
-           case SortOptions.None:
-             f.Direction = SortOptions.Up;
-             f.Priority = getMaxPriority()+1;
-             break;
-
-           case SortOptions.Up:
-             Filters[id].Direction = SortOptions.Down;
-             // transform icon to turn downwards to indicate descending order
-             break;
-
-           case SortOptions.Down:
-             Filters[id].Direction = SortOptions.None;
-             removeOrder(id);
-             break;
-         }
-
-         setButtonsFromFilters(f);
-         refreshSortPriorities();
-         Resort();
-         setGrid(globData);
-
-      });
-    
       column=nextColumns();
   }
-
 
   // populate grid with provided data
   for (item of data)
@@ -204,12 +144,12 @@ function setGrid(data)
      
      while (column!=null)
      {
-
+      
       var datapiece ="";
-
+      //determine how to display items
       switch(column.Handler)
       {
-        case 'Priority':
+        case HandlerOptions.Priority:
           switch(item[column.DataId])
           {
             case 'L':
@@ -227,19 +167,33 @@ function setGrid(data)
             }
           break;
 
-        case 'Tag':
+        case HandlerOptions.Tags:
           if (typeof item[column.DataId] != "undefined")
           {
             for (tag of item[column.DataId])
             {
-              datapiece+='+'+tag+" ";
+              var newtag = $("<span>")
+              .attr('id','tag'+tag+item.uuid)
+              .attr('data-uuid',item.uuid)
+              .attr('data-tag',tag)
+              .attr('margin-left',5)
+              .html('+'+tag);
+          
+              var taghtml = newtag.prop('outerHTML');
+              console.log(taghtml);
+              datapiece+=taghtml+" ";
             }
           }
           break;
 
-        default:
+        case HandlerOptions.None:
             datapiece=item[column.DataId];
           break;
+      }
+
+      if (column.Handler==HandlerOptions.Tags)
+      {
+        console.log(datapiece);
       }
       
       $('<div>')
@@ -248,8 +202,6 @@ function setGrid(data)
       .html(datapiece)
       .addClass('dataitem')
       .appendTo(t);
-
-
 
       column=nextColumns();
      }
@@ -265,10 +217,11 @@ function setGrid(data)
        
        if ( column.Editable )
        {
-        ('<textarea')
+        ('<textarea>')
         .attr('id',id+'editor')
         .attr('style','width:100%;height:100%')
-        .val()    
+        .val(ByUUID[uuid])
+        .prop('outerHTML');    
        }
      });
 
@@ -287,6 +240,67 @@ function setGrid(data)
 
 }
 
+function addColumnHeader(column,container)
+{
+  // add cell header div
+  $('<div/>')
+  .attr('id',column.HeaderDivName)
+  .addClass('cellheader')
+  .html(column.Header)
+  .appendTo(container);
+}
+
+function addLineBreak(container)
+{
+  $('<br>').appendTo(container);
+}
+
+function addSortIcon(column,container)
+{
+      // add sort icon next to header text
+      $('<img>')
+      .addClass('resizeimage')
+      .attr('id',column.SortButtonName)
+      .attr('src','images/inactive arrow.png')
+      .attr('data-col',column.Header)
+      .attr('data-dataid',column.DataId)
+      .appendTo(container);
+}
+
+function sortButtonClick()
+{
+  var id =  $(this).attr('data-col');
+  console.log('id discovered was'+ id);
+
+  var f = Filters[id];
+
+  switch(f.Direction)
+  {
+    
+    case SortOptions.None:
+      f.Direction = SortOptions.Up;
+      f.Priority = getMaxPriority()+1;
+      break;
+
+    case SortOptions.Up:
+      Filters[id].Direction = SortOptions.Down;
+      // transform icon to turn downwards to indicate descending order
+      break;
+
+    case SortOptions.Down:
+      Filters[id].Direction = SortOptions.None;
+      removeOrder(id);
+      break;
+  }
+
+  setButtonsFromFilters(f);
+  refreshSortPriorities();
+  Resort();
+  setGrid(globData);
+
+
+}
+
 
 function refreshSortPriorities()
 {
@@ -301,108 +315,5 @@ function refreshSortPriorities()
   }
 }
 
-// for when an update needs forced, like after turning off sorting on a column
-function removeOrder(Id)
-{
-  var ori = Filters[Id].Priority;
 
-  Filters[Id].Priority=0;
-
-  for (filterId in Filters)
-  {
-    f = Filters[filterId];
-
-    if (f.Priority > ori)
-    {
-      // shift the items after the previous priority back by one.
-        f.Priority--;
-    }
-  }
-
-}
-
-// updates the value of the priority field when user clicks the priority box
-// assumes no new items have just been turned on.
-function updateOrder(Id)
-{
-
-  console.log ('Id in udord is '+Id);
-  // retrieve the max a-fucking-gain
-  // while sitting waiting for an annoying black male to not bug U
- 
-  var max = getMaxPriority();
-
-  // get the current items priority
-  var ori = Filters[Id].Priority;
-
-  console.log('max is '+max);
-  console.log('original priority is '+ori);
-  
- 
-
-  if (ori==max)
-  {
-    Filters[Id].Priority=1;
-  }
-  else
-  {
-    Filters[Id].Priority++;
-  }
-
-
-  // priority is set to last
-
-  if (ori ==  max)
-  {
-    for (filterId in Filters)
-    {
-      // skip the selected item otherwise increment priority
-      if (filterId != Id)
-      {
-        Filters[filterId].Priority++;
-      }               
-    }
-  }
-  else
-  {
-    // use case for a priority which was in the middle somewhere
-  
-    for (filterId in Filters)
-    {
-      var item = Filters[filterId];
-
-      if (item.Priority !=0 && filterId !=Id)
-      {
-          if (item.Priority == max)
-          {
-            item.Priority=1;
-          }  
-          else
-          {
-            item.Priority++;
-          }
-      }
-    }
-  }
-
-  refreshSortPriorities();
-}
-
-
-function getMaxPriority()
-{
-
-  var prior=0;
-
-  for (id in Filters)
-  {
-    if (Filters[id].Priority > prior)
-    {
-      prior = Filters[id].Priority;
-    }
-  }
-
-
-  return prior;
-}
 

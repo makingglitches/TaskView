@@ -1,9 +1,4 @@
-
-// convenience object for setting SortOrder field of filter object
-const SortOptions = {Up:1,Down:2,None:0}
-// display, search and sort filters
-
-const HandlerOptions = { Priority:"Priority", Tags:"Tags"}
+const HandlerOptions = { Priority:"Priority", Tags:"Tags",None:''}
 
 const EditorType = { 
                       TextArea:"TextArea",
@@ -13,12 +8,12 @@ const EditorType = {
                       PriorityDDL:"DDLPriority" 
                     }
 
-var columns = [
+var Columns = [
     {	
       Header:	'Id'	,	
       DataId:	'id'	,	
       Width:	80	,	
-      Handler:	'', 
+      Handler:	HandlerOptions.None, 
       Editable:false},
 
     {	
@@ -35,7 +30,7 @@ var columns = [
       Header:	'Description'	,	
       DataId:	'description'	,	
       Width:	300	,	
-      Handler:	'', 
+      Handler:	HandlerOptions.None, 
       Editable:true, 
       UpdateCommand:'task $i modify $1',
       Editor:EditorType.TextArea
@@ -46,7 +41,7 @@ var columns = [
       Header:	'Status'	,	
       DataId:	'status'	,	
       Width:	120	,	
-      Handler:	'', 
+      Handler:	HandlerOptions.None, 
       Editable:true,
       UpdateCommand:'task $i modify status:$1',
       Editor:EditorType.StatusDDL
@@ -72,42 +67,8 @@ var columns = [
     }
 ];
 
-var Filters = initFilters();
-
-function initFilters()
-{
-
-  var filters={};
-
-  resetColumns();
-
-  var c = nextColumns();
-
-  // some initialization code for search filters
-  while ( c!=null)
-  {
-        filters[c.Header]= 
-        {
-          Direction:SortOptions.None, 
-          Priority:0, 
-          id:c.Header,
-          Column:c,
-          OrderButtonName:c.Header+"order",
-          SortButtonName:c.Header+"sort",
-          HeaderDivName : c.Header+"head"
-        };
-        
-        c.SortButtonName = filters[c.Header].SortButtonName;
-        c.OrderButtonName = filters[c.Header].OrderButtonName;
-        c.HeaderDivName = c.Header+"head";
-
-        c=nextColumns();
-  }
-
-  return filters;
-
-}
-
+// using resetColumns() and nextColumns() to step through columnn definitions this is the index they use
+// on the columns object
 var _column_curr_index = 0;
 
 function resetColumns()
@@ -117,124 +78,41 @@ function resetColumns()
 
 function  nextColumns()
 {
-    if ( _column_curr_index == columns.length)
+    if ( _column_curr_index == Columns.length)
     {
         return null;
     }
     else
     {
         _column_curr_index++;
-        return columns[_column_curr_index-1];
+        return Columns[_column_curr_index-1];
     }
-}
-
-function Resort()
-{
-  var sortpath = [];
-
-  for (filterId in Filters)
-  {
-    var f = Filters[filterId];
-
-    if ( f.Direction != SortOptions.None)
-    {
-        sortpath.push({id:f.Column.DataId, dir:f.Direction,pr:f.Priority, filter:f});
-    }
-  }
-
-  if (sortpath.length > 0)
-  {
-    sortpath.sort(function(a,b)
-    {
-        if (a.pr > b.pr )
-        { 
-          return 1;
-        }
-        else if (a.pr < b.pr)
-        {
-          return -1;
-        }
-        else return 0;
-    });
-
-    var sortfunctioncode = 'function gridSort(data) { data.sort(function(d1,d2) {';
-
-      for (o of sortpath)
-      {
-        // get the indexed parameter passed to the sort function
-        var symbol1 = "d1['"+o.id+"']";
-        var symbol2 = "d2['"+o.id+"']";
-
-        
-        sortfunctioncode+='if (typeof '+symbol1+' == "undefined" &&';
-   
-        sortfunctioncode+=' typeof '+symbol2+' != "undefined") { return '+
-        (o.dir == SortOptions.Up?' ':'-')+"1; }";
-
-
-        sortfunctioncode+='if (typeof '+symbol1+' != "undefined" &&';
-   
-        sortfunctioncode+=' typeof '+symbol2+' == "undefined") { return '+
-        (o.dir == SortOptions.Up?'-':' ')+ "1;}";
-
-        
-        if (o.filter.Column.Handler== HandlerOptions.Tags)
-        {
-          // this is a really dumb way to do this
-          // but tags arent really more than a convenience like a database key
-          // again.
-        
-            sortfunctioncode+=symbol1+'.sort();';
-            sortfunctioncode+=symbol2+'.sort();';
-            
-            sortfunctioncode+='var s1 ='+symbol1+'.join(" "); ';
-            sortfunctioncode+='var s2 ='+symbol2+'.join(" "); ';
-
-            sortfunctioncode+=
-                "if (s1 " + (o.dir == SortOptions.Up?'>':'<')+" s2) { return 1; } "
-                "if (s1 " + (o.dir == SortOptions.Up?'<':'>')+" s2) { return -1;} ";
-            
-        }
-        else
-        {
-
-         sortfunctioncode+=
-                "if ("+symbol1
-                + (o.dir == SortOptions.Up?'>':'<')
-                +symbol2+" ) { return 1;} ";
-          
-          sortfunctioncode+=
-                "if ("+symbol1
-                + (o.dir == SortOptions.Up?'<':'>')
-                +symbol2+" ) { return -1;} ";
-        }
-      }
-
-      sortfunctioncode+= 'return 0; });   }';
-    
-  }
-  else
-  {
-    var sortfunctioncode='function gridSort(data) { console.log("empty search filters");}';
-  }
-
-  console.log(sortfunctioncode);
-  eval(sortfunctioncode);
-
-  gridSort(globData);
-
-  console.log(sortpath);
 }
 
 var ByUUID={};
 
-function testindex(data)
+function buildUUIDIndex(data)
 {
   var uuidindex={};
 
   for (i in data )
   {
-    uuidindex[data[i].uuid]=data[i];
+    var uuid = data[i].uuid;
+
+    if (typeof uuidindex[uuid] == 'undefined')
+    {
+      uuidindex[uuid]=data[i];
+    }
+    else if (typeof uuidindex[uuid] == 'Array') 
+    {
+      uuidindex[uuid].push(data[i]);
+    }
+    else
+    {
+      var ori = uuidindex[uuid];
+      uuidindex[uuid]=[];
+      uuidindex[uuid].push(ori,data[i]);
+    }
   }
 
   return uuidindex;
@@ -247,9 +125,11 @@ function getTasks(setGrid)
     function(data) 
     {
       console.log( "success" );
+      
       globData=data;
       setGrid(data);
-      ByUUID=testindex(globData);
+
+      ByUUID=buildUUIDIndex(globData);
     })
   .done(function() 
   {
@@ -263,3 +143,71 @@ function getTasks(setGrid)
   });
   
 }
+
+// updates the value of the priority field when user clicks the priority box
+// assumes no new items have just been turned on.
+function updateSortPriorities(Id)
+{
+
+  console.log ('Id in udord is '+Id);
+  // retrieve the max a-fucking-gain
+  // while sitting waiting for an annoying black male to not bug U
+ 
+  var max = getMaxPriority();
+
+  // get the current items priority
+  var ori = Filters[Id].Priority;
+
+  console.log('max is '+max);
+  console.log('original priority is '+ori);
+  
+ 
+
+  if (ori==max)
+  {
+    Filters[Id].Priority=1;
+  }
+  else
+  {
+    Filters[Id].Priority++;
+  }
+
+
+  // priority is set to last
+
+  if (ori ==  max)
+  {
+    for (filterId in Filters)
+    {
+      // skip the selected item otherwise increment priority
+      if (filterId != Id)
+      {
+        Filters[filterId].Priority++;
+      }               
+    }
+  }
+  else
+  {
+    // use case for a priority which was in the middle somewhere
+  
+    for (filterId in Filters)
+    {
+      var item = Filters[filterId];
+
+      if (item.Priority !=0 && filterId !=Id)
+      {
+          if (item.Priority == max)
+          {
+            item.Priority=1;
+          }  
+          else
+          {
+            item.Priority++;
+          }
+      }
+    }
+  }
+
+  refreshSortPriorities();
+}
+
