@@ -12,8 +12,7 @@ html
     script(src='/javascripts/sortfunctions.js',type='text/javascript')
     script(src='/javascripts/filters.js',type="text/javascript")
   
-  body
-    // LOOKS LIKE YOU NAME THINGS WITH PLACEHOLDERS
-    div(id='modaldiv',style='display:none;position:absolute;z-index:5;left:0;top:0;width:100%;height:100%;opacity:0')
-      img(src='/images/modal.png',style='width:`100%;height:100%')
+  body   // LOOKS LIKE YOU NAME THINGS WITH PLACEHOLDERS
+    div(id='modaldiv',class='modaldiv')
+      img(src='/images/modal.png',class='modalimg')
     block content

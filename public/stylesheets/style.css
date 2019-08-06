@@ -10,6 +10,27 @@ a {
 }
 
 
+.modaldiv
+{
+  left:50%;
+  top:50%;
+  align-self: center;
+  position: fixed;
+  z-index:5;
+  background-color: rgba(0,0,0,0.8);
+  width:0%;
+  height:0%;
+}
+
+.modalimg
+{
+  object-fit: fill;
+  width: 100%;
+  height:100%;
+  opacity: 0.5;
+}
+
+
 .tagitem
 {
   margin-left: 10px;

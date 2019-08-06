@@ -53,3 +53,17 @@ function addLineBreak(container)
 {
   $('<br>').appendTo(container);
 }
+
+
+function doModal(container, show=true)
+{
+    if (show)
+    {
+        $(container).animate({height:"100%",width:'100%',left:"0%",top:"0%"},'slow');
+    }
+    else
+    {
+        $(container).animate({height:"0%",width:'0%',left:"50%",top:"50%"},'slow');
+    }
+    
+}
