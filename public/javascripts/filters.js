@@ -2,7 +2,7 @@
 
 //load this script first
 // convenience object for setting SortOrder field of filter object
-const SortOptions = {Up:1,Down:2,None:0}
+const SortOptions = {Descending:1,Ascending:2,None:0}
 // display, search and sort filters
 
 var Filters = initFilters();
@@ -19,21 +19,7 @@ function initFilters()
   // some initialization code for search filters
   while ( c!=null)
   {
-        filters[c.Header]= 
-        {
-          Direction:SortOptions.None, 
-          Priority:0, 
-          id:c.Header,
-          Column:c,
-          OrderButtonName:c.Header+"order",
-          SortButtonName:c.Header+"sort",
-          HeaderDivName : c.Header+"head"
-        };
-        
-        c.SortButtonName = filters[c.Header].SortButtonName;
-        c.OrderButtonName = filters[c.Header].OrderButtonName;
-        c.HeaderDivName = c.Header+"head";
-
+        filters[c.HeaderId]= new FilterObject(SortOptions.None,0,c);
         c=nextColumns();
   }
 
@@ -78,53 +64,30 @@ function Resort()
         var symbol1 = "d1['"+o.id+"']";
         var symbol2 = "d2['"+o.id+"']";
 
-        
-        sortfunctioncode+='if (typeof '+symbol1+' == "undefined" &&';
-   
-        sortfunctioncode+=' typeof '+symbol2+' != "undefined") { return '+
-        (o.dir == SortOptions.Up?' ':'-')+"1; }";
+        // causes all kind of errors if you do not check to see whether one or both variables are undefined
+        // first
+        sortfunctioncode+='var definedCrit=UndefinedStatus('+symbol1+','+symbol2+','+o.dir+');';
+        sortfunctioncode+='if (definedCrit!=5) { return definedCrit;}';
 
-
-        sortfunctioncode+='if (typeof '+symbol1+' != "undefined" &&';
-   
-        sortfunctioncode+=' typeof '+symbol2+' == "undefined") { return '+
-        (o.dir == SortOptions.Up?'-':' ')+ "1;}";
-
-        sortfunctioncode+='if (typeof '+symbol1+' == "undefined" &&';
-   
-        sortfunctioncode+=' typeof '+symbol2+' == "undefined") { return '+
-         "0;}";
-
-        
         if (o.filter.Column.Handler== HandlerOptions.Tags)
         {
-          // this is a really dumb way to do this
-          // but tags arent really more than a convenience like a database key
-          // again.
-        
-            sortfunctioncode+=symbol1+'.sort();';
-            sortfunctioncode+=symbol2+'.sort();';
-            
-            sortfunctioncode+='var s1 ='+symbol1+'.join(" "); ';
-            sortfunctioncode+='var s2 ='+symbol2+'.join(" "); ';
+          sortfunctioncode+='return CompareTagArrays('+symbol1+','+symbol2+','+o.dir+');'
 
-            sortfunctioncode+=
-                "if (s1 " + (o.dir == SortOptions.Up?'>':'<')+" s2) { return 1; } "
-                "if (s1 " + (o.dir == SortOptions.Up?'<':'>')+" s2) { return -1;} ";
-            
+          console.log(sortfunctioncode);
         }
         else
         {
 
+
+        // greater than test
          sortfunctioncode+=
-                "if ("+symbol1
-                + (o.dir == SortOptions.Up?'>':'<')
-                +symbol2+" ) { return 1;} ";
-          
-          sortfunctioncode+=
-                "if ("+symbol1
-                + (o.dir == SortOptions.Up?'<':'>')
-                +symbol2+" ) { return -1;} ";
+                "if ("+symbol1+' > ' +symbol2+" ) { return "
+                +(o.dir == SortOptions.Descending?'-1':'1')+ ";} ";
+        
+        // less than test
+        sortfunctioncode+=
+                "if ("+symbol1+' < ' +symbol2+" ) { return "
+                +(o.dir == SortOptions.Descending?'1':'-1')+ ";} ";
         }
       }
 
@@ -136,12 +99,12 @@ function Resort()
     var sortfunctioncode='function gridSort(data) { console.log("empty search filters");}';
   }
 
-  console.log(sortfunctioncode);
+ // console.log(sortfunctioncode);
   eval(sortfunctioncode);
 
   gridSort(globData);
 
-  console.log(sortpath);
+  // console.log(sortpath);
 }
 
 // for when an update needs forced, like after turning off sorting on a column

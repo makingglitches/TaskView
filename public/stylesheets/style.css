@@ -73,9 +73,16 @@ a {
   filter: invert(100)
 }
 
+.border
+{
+  border-color: white;
+  border-style: dashed;
+  padding: 5px
+
+}
+
 .dataitem
 {
-
   border-color: white;
   border-style: dashed;
   padding: 5px;

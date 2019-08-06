@@ -12,6 +12,10 @@ $(document).resize(function()
 
 });
 
+/**
+ * Show or hide loading icon
+ * @param  {boolean} on indicates whether the icon should be shown or not, true is yes false is no
+ */
 function showLoad(on)
 {
     if (on)
@@ -26,13 +30,11 @@ function showLoad(on)
     }
 }
 
-
-// flag indicating filters have not been set up yet.
-//var initial =1;
-
-
-
-// sets the grid container properties
+/**
+ * sets the grid container properties
+ * 
+ * @param  {string} containerId - points to the div which is to contain the data grid
+ */
 function setContainerProps(containerId)
 {
 
@@ -53,6 +55,11 @@ function setContainerProps(containerId)
   $('#'+containerId).attr('style',sizestring);
 }
 
+/**
+ * Sets up display values for sort icons, ensuring they are in the proper state 
+ * @param  {FilterObject} filter - an item from the global filters array which specifies sort options and properties.
+ * @see filters
+ */
 function setButtonsFromFilters(filter)
 {
 
@@ -61,15 +68,16 @@ function setButtonsFromFilters(filter)
   if (filter.Direction != SortOptions.None)
   {
 
-    if ( $('#'+filter.OrderButtonName).length==0)
+    // if order button is not found add it.
+    if ( $('#'+filter.Column.OrderButtonName).length==0)
     {
       
       $('<span>')
-      .attr('id',filter.OrderButtonName)
+      .attr('id',filter.Column.OrderButtonName)
       .attr('data-col',id)
-      .appendTo('#'+filter.HeaderDivName);
+      .appendTo(filter.Column.HeaderDiv());
 
-      $('#'+filter.OrderButtonName).click(function()
+      $('#'+filter.Column.OrderButtonName).click(function()
       {
         var id =  $(this).attr('data-col');
         updateSortPriorities(id);
@@ -79,36 +87,41 @@ function setButtonsFromFilters(filter)
 
     }
 
-    $('#'+filter.SortButtonName).addClass('arrowactive');    
+    $('#'+filter.Column.SortButtonName).addClass('arrowactive');    
 
   }
 
   // apply display logic.
   switch(filter.Direction)
   {
-    case SortOptions.Up:
+    case SortOptions.Descending:
       // add sort priority control next to sort arrow
       
       // transform icon to active and turn right side up to indicate ascending order sort
-      $('#'+filter.SortButtonName).addClass('invertrotate');
+    
     break;
 
-    case SortOptions.Down:
-      $('#'+filter.SortButtonName).removeClass('invertrotate');  
+    case SortOptions.Ascending:
+        $('#'+filter.Column.SortButtonName).addClass('invertrotate');  
     break;
 
     case SortOptions.None:
+        $('#'+filter.Column.SortButtonName).removeClass('invertrotate'); 
       //revert sort arrow to original appearance
-      $('#'+filter.SortButtonName).removeClass('arrowactive');
+      $('#'+filter.Column.SortButtonName).removeClass('arrowactive');
       // remove sort priority control
-      $('#'+filter.OrderButtonName).remove();
+      $('#'+filter.Column.OrderButtonName).remove();
     break;
   }
 
 }
  
-
-// sets up the grid and populates it with data from getTasks() call
+/**
+ * Takes json data provided by the backend and populates the grid with it.
+ * @param  {TaskDataObject[]} data - contains an array of TaskObjectData
+ * @see getTasks
+ * @see globData
+ */
 function setGrid(data)
 {
   var t = $('#taskcontainer');
@@ -133,6 +146,8 @@ function setGrid(data)
 
       column=nextColumns();
   }
+
+  addOptionPane(t);
 
   // populate grid with provided data
   for (item of data)
@@ -176,12 +191,11 @@ function setGrid(data)
               .attr('id','tag'+tag+item.uuid)
               .attr('data-uuid',item.uuid)
               .attr('data-tag',tag)
-              .attr('margin-left',5)
               .addClass('tagitem')
               .html('+'+tag);
           
               var taghtml = newtag.prop('outerHTML');
-              console.log(taghtml);
+         //     console.log(taghtml);
               datapiece+=taghtml+" ";
             }
           }
@@ -192,14 +206,14 @@ function setGrid(data)
           break;
       }
 
-      if (column.Handler==HandlerOptions.Tags)
-      {
-        console.log(datapiece);
-      }
+    //  if (column.Handler==HandlerOptions.Tags)
+    //  {
+    //   console.log(datapiece);
+    //  }
       
       $('<div>')
       .attr('data-uuid',item.uuid)
-      .attr('data-id',column.Header)
+      .attr('data-id',column.HeaderId)
       .html(datapiece)
       .addClass('dataitem')
       .appendTo(t);
@@ -237,21 +251,75 @@ function setGrid(data)
 
 }
 
+function addOptionPane(container)
+{
+  $("<div/>")
+  .attr("id",'searchoptionspane')
+  .attr('style','grid-column-start:span '+Columns.length+'; height:20px; ')
+  .addClass('border')
+  .appendTo(container);
+
+  var pane = $('#searchoptionspane');
+
+  // $('<img>')
+  // .attr('id','expandoptionsbutton')
+  // .attr('src','/images/expand.png')
+  // .addClass('resizeimage')
+  // .appendTo(pane);
+
+  addCheck('downsortempty',pane,'Sort empty values to the bottom ?',false);
+  var icon = addIcon('/images/settings.png',pane,'downsortoptions',false);
+  
+  icon.attr('style','margin-left:5px;padding-left:0px;');
+  
+  $('<div>/')
+  .attr('id','forwhichdownsortdiv')
+  .attr('style','padding-left:10px')
+  .appendTo(pane);
+
+  var downopts = $('#forwhichdownsortdiv');
+
+  addCheck('downsortallcheck',downopts,'All',false);
+  
+
+  resetColumns();
+
+  var column = nextColumns();
+
+  while (column !=null)
+  {
+    
+    addCheck("downsort"+column.HeaderId+"check",downopts ,column.HeaderId);
+    column = nextColumns();
+  }
+
+  $(downopts).hide();
+
+}
+
+
+/**
+ * Adds a column header to the data grid
+ * @param  {ColumnObject} column - column object from the globcal columns array
+ * @param  {JQuery} container - selected jquery element for the taskcontainer eg grid
+ * @see columns
+ */
 function addColumnHeader(column,container)
 {
   // add cell header div
   $('<div/>')
   .attr('id',column.HeaderDivName)
   .addClass('cellheader')
-  .html(column.Header)
+  .html(column.HeaderId)
   .appendTo(container);
 }
 
-function addLineBreak(container)
-{
-  $('<br>').appendTo(container);
-}
 
+/**
+ * Adds a sort icon for the column.
+ * @param  {ColumnObject} column - column from the global columns array
+ * @param  {JQuery} container - the div to add the button to selected by jquery
+ */
 function addSortIcon(column,container)
 {
       // add sort icon next to header text
@@ -259,15 +327,17 @@ function addSortIcon(column,container)
       .addClass('resizeimage')
       .attr('id',column.SortButtonName)
       .attr('src','images/inactive arrow.png')
-      .attr('data-col',column.Header)
+      .attr('data-col',column.HeaderId)
       .attr('data-dataid',column.DataId)
       .appendTo(container);
 }
-
+/**
+ * Event handler sparked by clicking on of the sort icons.
+ */
 function sortButtonClick()
 {
   var id =  $(this).attr('data-col');
-  console.log('id discovered was'+ id);
+ // console.log('id discovered was'+ id);
 
   var f = Filters[id];
 
@@ -275,16 +345,15 @@ function sortButtonClick()
   {
     
     case SortOptions.None:
-      f.Direction = SortOptions.Up;
+      f.Direction = SortOptions.Ascending;
       f.Priority = getMaxPriority()+1;
       break;
 
-    case SortOptions.Up:
-      Filters[id].Direction = SortOptions.Down;
-      // transform icon to turn downwards to indicate descending order
+    case SortOptions.Ascending:
+      Filters[id].Direction = SortOptions.Descending;
       break;
 
-    case SortOptions.Down:
+    case SortOptions.Descending:
       Filters[id].Direction = SortOptions.None;
       removeOrder(id);
       break;
@@ -294,11 +363,11 @@ function sortButtonClick()
   refreshSortPriorities();
   Resort();
   setGrid(globData);
-
-
 }
 
-
+/**
+ * Ensures the numbers in all the sort priorities in the grid are correct
+ */
 function refreshSortPriorities()
 {
   for (filterId in Filters)
@@ -307,7 +376,7 @@ function refreshSortPriorities()
 
     if (f.Priority >0)
     {
-      $('#'+f.OrderButtonName).text(f.Priority);
+      $('#'+f.Column.OrderButtonName).text(f.Priority);
     }
   }
 }

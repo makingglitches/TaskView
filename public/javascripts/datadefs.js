@@ -5,66 +5,30 @@ const EditorType = {
                       TagEditor:"TagEditor",
                       ProjectSelector:"DDLProject",
                       StatusDDL:"StatusDDL",
-                      PriorityDDL:"DDLPriority" 
+                      PriorityDDL:"DDLPriority",
+                      None:'None' 
                     }
 
 var Columns = [
-    {	
-      Header:	'Id'	,	
-      DataId:	'id'	,	
-      Width:	80	,	
-      Handler:	HandlerOptions.None, 
-      Editable:false},
-
-    {	
-      Header:	'Project'	,	
-      DataId:	'project'	,	
-      Width:	120	,	
-      Handler:	'', 
-      Editable:true,
-      UpdateCommand:'task $i modify project:$1',
-      Editor:EditorType.ProjectSelector
-    },
-   
-    {	
-      Header:	'Description'	,	
-      DataId:	'description'	,	
-      Width:	300	,	
-      Handler:	HandlerOptions.None, 
-      Editable:true, 
-      UpdateCommand:'task $i modify $1',
-      Editor:EditorType.TextArea
-    },
-    // use-case not covered by one command for updatecommand, again.
-    // possibly make this a function call also accepting one atomic operation
-    {	
-      Header:	'Status'	,	
-      DataId:	'status'	,	
-      Width:	120	,	
-      Handler:	HandlerOptions.None, 
-      Editable:true,
-      UpdateCommand:'task $i modify status:$1',
-      Editor:EditorType.StatusDDL
-    },
     
-    {
-      Header:	'Priority'	,	
-      DataId:	'priority'	,	
-      Width:	120	,	
-      Handler:HandlerOptions.Priority, 
-      Editable:true,
-      Editor:EditorType.PriorityDDL
-    },
+      new ColumnObject('Id'	,'id'	,	80	,	HandlerOptions.None, 
+      '',EditorType.None), 
+      
+      new ColumnObject(	'Project'	,	'project'	,	120	,HandlerOptions.None, 
+      'task $i modify project:$1',EditorType.ProjectSelector),
+    
+      new ColumnObject('Description','description',300,HandlerOptions.None,
+      'task $i modify $1',EditorType.TextArea),
 
-    {	
-      Header:	'Tags'	,	
-      DataId:	'tags'	,	
-      Width:	200	,	
-      Handler:	HandlerOptions.Tags, 
-      Editable:false,
-      Editor:EditorType.TagEditor,
-      UpdateCommand:''
-    }
+      new ColumnObject('Status','status'	,120,	HandlerOptions.None,
+      'task $i modify status:$1',EditorType.StatusDDL),
+
+      new ColumnObject('Priority','priority',120,HandlerOptions.Priority,
+      'task $i modify priority:$1',EditorType.PriorityDDL),
+      
+      new ColumnObject('Tags','tags',	200,HandlerOptions.Tags,
+      '', EditorType.TagEditor)
+    
 ];
 
 // using resetColumns() and nextColumns() to step through columnn definitions this is the index they use
@@ -124,7 +88,7 @@ function getTasks(setGrid)
   var jqxhr = $.getJSON( "/users/getTasks", 
     function(data) 
     {
-      console.log( "success" );
+     // console.log( "success" );
       
       globData=data;
       setGrid(data);
@@ -133,13 +97,13 @@ function getTasks(setGrid)
     })
   .done(function() 
   {
-      console.log( "second success" );
+     // console.log( "second success" );
   })
   .fail(function() {
-    console.log( "error" );
+   // console.log( "error" );
   })
   .always(function() {
-    console.log( "complete" );
+   // console.log( "complete" );
   });
   
 }
@@ -149,7 +113,7 @@ function getTasks(setGrid)
 function updateSortPriorities(Id)
 {
 
-  console.log ('Id in udord is '+Id);
+ // console.log ('Id in udord is '+Id);
   // retrieve the max a-fucking-gain
   // while sitting waiting for an annoying black male to not bug U
  
@@ -158,8 +122,8 @@ function updateSortPriorities(Id)
   // get the current items priority
   var ori = Filters[Id].Priority;
 
-  console.log('max is '+max);
-  console.log('original priority is '+ori);
+ // console.log('max is '+max);
+ // console.log('original priority is '+ori);
   
  
 
