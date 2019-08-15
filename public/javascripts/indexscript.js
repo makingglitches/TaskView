@@ -126,8 +126,16 @@ function setGrid(data)
 {
   var t = $('#taskcontainer');
 
+  
   // clear data and header rows
   t.children().remove('div');
+
+
+  var headercont = $('<div>')
+                   .attr('id','headerdiv')
+                   .attr('style',"grid-column-start:span "+ countColumns()+
+                   "; position:sticky; top:0; grid-row-start:span 2")
+                   .appendTo(t);
 
   setContainerProps('taskcontainer');
 
@@ -137,17 +145,17 @@ function setGrid(data)
   
   while (column!=null)
   {    
-      addColumnHeader(column,t);
-      addLineBreak($('#'+column.HeaderDivName));
-      addSortIcon(column,'#'+column.HeaderDivName);
-      
+      var newheader = addColumnHeader(column,headercont);
+      addLineBreak(newheader);
+      var button = addSortIcon(newheader);
+
       // add click event handler to sort arrow icon next to header
-      $('#'+column.SortButtonName).click(sortButtonClick);
+      $(button).click(sortButtonClick);
 
       column=nextColumns();
   }
 
-  addOptionPane(t);
+  addOptionPane(headercont);
 
   // populate grid with provided data
   for (item of data)
@@ -215,6 +223,7 @@ function setGrid(data)
       .attr('data-uuid',item.uuid)
       .attr('data-id',column.HeaderId)
       .html(datapiece)
+      .outerWidth(column.Width)
       .addClass('dataitem')
       .appendTo(t);
 
@@ -255,7 +264,7 @@ function addOptionPane(container)
 {
   $("<div/>")
   .attr("id",'searchoptionspane')
-  .attr('style','grid-column-start:span '+Columns.length+'; height:20px; ')
+  .attr('style','grid-column-start:span '+Columns.length+'; height:20px; position:sticky;')
   .addClass('border')
   .appendTo(container);
 
@@ -267,7 +276,7 @@ function addOptionPane(container)
   // .addClass('resizeimage')
   // .appendTo(pane);
 
-  addCheck('downsortempty',pane,'Sort empty values to the bottom ?',false);
+  addCheckGroup('downsortempty',pane,'Sort empty values to the bottom ?',false);
   var icon = addIcon('/images/settings.png',pane,'downsortoptions',false);
   
   icon.attr('style','margin-left:5px;padding-left:0px;');
@@ -279,7 +288,7 @@ function addOptionPane(container)
 
   var downopts = $('#forwhichdownsortdiv');
 
-  addCheck('downsortallcheck',downopts,'All',false);
+  addCheckGroup('downsortallcheck',downopts,'All',false);
   
 
   resetColumns();
@@ -289,7 +298,7 @@ function addOptionPane(container)
   while (column !=null)
   {
     
-    addCheck("downsort"+column.HeaderId+"check",downopts ,column.HeaderId);
+    addCheckGroup("downsort"+column.HeaderId+"check",downopts ,column.HeaderId);
     column = nextColumns();
   }
 
@@ -298,39 +307,10 @@ function addOptionPane(container)
 }
 
 
-/**
- * Adds a column header to the data grid
- * @param  {ColumnObject} column - column object from the globcal columns array
- * @param  {JQuery} container - selected jquery element for the taskcontainer eg grid
- * @see columns
- */
-function addColumnHeader(column,container)
-{
-  // add cell header div
-  $('<div/>')
-  .attr('id',column.HeaderDivName)
-  .addClass('cellheader')
-  .html(column.HeaderId)
-  .appendTo(container);
-}
 
 
-/**
- * Adds a sort icon for the column.
- * @param  {ColumnObject} column - column from the global columns array
- * @param  {JQuery} container - the div to add the button to selected by jquery
- */
-function addSortIcon(column,container)
-{
-      // add sort icon next to header text
-      $('<img>')
-      .addClass('resizeimage')
-      .attr('id',column.SortButtonName)
-      .attr('src','images/inactive arrow.png')
-      .attr('data-col',column.HeaderId)
-      .attr('data-dataid',column.DataId)
-      .appendTo(container);
-}
+
+
 /**
  * Event handler sparked by clicking on of the sort icons.
  */

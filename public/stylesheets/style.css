@@ -74,6 +74,7 @@ a {
 
 .cellheader {
   color:yellow;
+  background-color: black;
   padding:5px;
   text-align: center;
   font-size:1.5em;
@@ -81,6 +82,10 @@ a {
   border-color: white;
   border-style: solid;
   padding-bottom: 5px;
+  display: inline-grid;
+  /* position:sticky;
+  top:0;
+  z-index:3; */
 }
 
 

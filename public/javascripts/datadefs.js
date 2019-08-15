@@ -11,22 +11,22 @@ const EditorType = {
 
 var Columns = [
     
-      new ColumnObject('Id'	,'id'	,	80	,	HandlerOptions.None, 
+      new ColumnObject(1,'Id'	,'id'	,	80	,	HandlerOptions.None, 
       '',EditorType.None), 
       
-      new ColumnObject(	'Project'	,	'project'	,	120	,HandlerOptions.None, 
+      new ColumnObject(	2,'Project'	,	'project'	,	120	,HandlerOptions.None, 
       'task $i modify project:$1',EditorType.ProjectSelector),
     
-      new ColumnObject('Description','description',300,HandlerOptions.None,
+      new ColumnObject(3,'Description','description',300,HandlerOptions.None,
       'task $i modify $1',EditorType.TextArea),
 
-      new ColumnObject('Status','status'	,120,	HandlerOptions.None,
+      new ColumnObject(4,'Status','status'	,120,	HandlerOptions.None,
       'task $i modify status:$1',EditorType.StatusDDL),
 
-      new ColumnObject('Priority','priority',120,HandlerOptions.Priority,
+      new ColumnObject(5,'Priority','priority',120,HandlerOptions.Priority,
       'task $i modify priority:$1',EditorType.PriorityDDL),
       
-      new ColumnObject('Tags','tags',	200,HandlerOptions.Tags,
+      new ColumnObject(6,'Tags','tags',	200,HandlerOptions.Tags,
       '', EditorType.TagEditor)
     
 ];
@@ -38,6 +38,12 @@ var _column_curr_index = 0;
 function resetColumns()
 {
   _column_curr_index = 0;
+}
+
+
+function countColumns()
+{
+  return Columns.length;
 }
 
 function  nextColumns()

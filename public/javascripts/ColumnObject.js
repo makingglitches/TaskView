@@ -2,6 +2,7 @@
 /**
  * Constructor for ColumnObject
  * @constructor
+ * @param  {number} gridNumber - the grid-column value of this column
  * @param  {string} headerId - the textual header column name
  * @param  {string} dataId - the text index of the data array returned by task export
  * @param  {number} width  - column width in px
@@ -9,8 +10,9 @@
  * @param  {string} updateCommand - the command for updating the task in taskwarrior $i is id ${n} are parameters
  * @param  {string} editorType=EditorType.None - The html editor type handler specified in EditorType
  */
-function ColumnObject(headerId, dataId, width,displayHandler,updateCommand,editorType=EditorType.None)
+function ColumnObject(gridNumber,headerId, dataId, width,displayHandler,updateCommand,editorType=EditorType.None)
 {
+    this.Number=gridNumber;
     this.HeaderId = headerId;	
     this.DataId=dataId;	
     this.Width = width;	
