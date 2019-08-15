@@ -3,7 +3,6 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-    // THIS IS JADE BUT IT ACTUALLY DOES RENDER
     script(src="/javascripts/jquery.js",type="text/javascript")
     script(src='/javascripts/helpers.js', type='text/javascript')
     script(src='/javascripts/ColumnObject.js', type='text/javascript')
@@ -12,7 +11,7 @@ html
     script(src='/javascripts/sortfunctions.js',type='text/javascript')
     script(src='/javascripts/filters.js',type="text/javascript")
   
-  body   // LOOKS LIKE YOU NAME THINGS WITH PLACEHOLDERS
+  body   
     div(id='modaldiv',class='modaldiv')
       img(src='/images/modal.png',class='modalimg')
     block content

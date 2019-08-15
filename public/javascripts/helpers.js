@@ -113,7 +113,7 @@ function addColumnHeader(column,container)
   // minus 10 for padding left + right
  // .attr('style','width:'+(column.Width-15)+"px;")
   .attr('style','grid-column:'+column.Number)
-  .outerWidth(column.Width)
+  //.outerWidth(column.Width)
   .addClass('cellheader')
   .html(column.HeaderId)
   .appendTo(container);

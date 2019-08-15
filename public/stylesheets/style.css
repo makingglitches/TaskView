@@ -1,5 +1,5 @@
 body {
-  padding: 50px;
+  padding: 0px;
   background-color: black;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   color:white; 
@@ -57,6 +57,15 @@ a {
   height: 100%;
 }
 
+
+.optionspane {
+  height:20px; 
+  position:sticky;
+  z-index: 3;
+  top:73px;
+  background-color: black;
+}
+
 .loading {
   position: absolute;
   top:50%;
@@ -82,10 +91,10 @@ a {
   border-color: white;
   border-style: solid;
   padding-bottom: 5px;
-  display: inline-grid;
-  /* position:sticky;
-  top:0;
-  z-index:3; */
+  height:50px;
+  position:sticky;
+  top:8px;
+  z-index:3; 
 }
 
 

@@ -124,30 +124,30 @@ function setButtonsFromFilters(filter)
  */
 function setGrid(data)
 {
-  var t = $('#taskcontainer');
+  var taskdiv = $('#taskcontainer');
 
   
   // clear data and header rows
-  t.children().remove('div');
+  taskdiv.children().remove('div');
 
 
-  var headercont = $('<div>')
-                   .attr('id','headerdiv')
-                   .attr('style',"grid-column-start:span "+ countColumns()+
-                   "; position:sticky; top:0; grid-row-start:span 2")
-                   .appendTo(t);
+  // var headercont = $('<div>')
+  //                  .attr('id','headerdiv')
+  //                  .attr('style',"grid-column-start:span "+ countColumns()+
+  //                  "; position:sticky; top:0;  grid-row-start:span 2")
+  //                  .appendTo(t);
 
   setContainerProps('taskcontainer');
-
+  
   // set up headers and links
   resetColumns();
   var column =nextColumns();
   
   while (column!=null)
   {    
-      var newheader = addColumnHeader(column,headercont);
+      var newheader = addColumnHeader(column,taskdiv);
       addLineBreak(newheader);
-      var button = addSortIcon(newheader);
+      var button = addSortIcon(column,newheader);
 
       // add click event handler to sort arrow icon next to header
       $(button).click(sortButtonClick);
@@ -155,7 +155,7 @@ function setGrid(data)
       column=nextColumns();
   }
 
-  addOptionPane(headercont);
+  addOptionPane(taskdiv);
 
   // populate grid with provided data
   for (item of data)
@@ -223,9 +223,9 @@ function setGrid(data)
       .attr('data-uuid',item.uuid)
       .attr('data-id',column.HeaderId)
       .html(datapiece)
-      .outerWidth(column.Width)
+      //.outerWidth(column.Width)
       .addClass('dataitem')
-      .appendTo(t);
+      .appendTo(taskdiv);
 
       column=nextColumns();
      }
@@ -264,8 +264,9 @@ function addOptionPane(container)
 {
   $("<div/>")
   .attr("id",'searchoptionspane')
-  .attr('style','grid-column-start:span '+Columns.length+'; height:20px; position:sticky;')
+  .attr('style','grid-column-start:span '+Columns.length+';')
   .addClass('border')
+  .addClass('optionspane')
   .appendTo(container);
 
   var pane = $('#searchoptionspane');
