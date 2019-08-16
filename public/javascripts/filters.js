@@ -2,11 +2,15 @@
 
 //load this script first
 // convenience object for setting SortOrder field of filter object
+
+
 const SortOptions = { Descending: 1, Ascending: 2, None: 0 };
 // display, search and sort filters
 
 var Filters = initFilters();
-
+/**
+ * Sets up the filters array, one per column defined field.
+ */
 function initFilters() {
 	var filters = {};
 
@@ -22,7 +26,9 @@ function initFilters() {
 
 	return filters;
 }
-
+/**
+ * Generates a sort function dynamically and places it in 'gridsort' then executes it.
+ */
 function Resort() {
 	var sortpath = [];
 
@@ -83,8 +89,6 @@ function Resort() {
 				if (o.filter.Column.Handler == HandlerOptions.Tags) {
 					sortfunctioncode +=
 						"return CompareTagArrays(" + symbolstr + ");";
-
-					console.log(sortfunctioncode);
 				}
 				else {
 					sortfunctioncode +=
@@ -109,8 +113,12 @@ function Resort() {
 	// console.log(sortpath);
 }
 
-// for when an update needs forced, like after turning off sorting on a column
-function removeOrder(Id) {
+
+/**
+ * Updates the filters resetting priority of id and adjusting the others
+ * @param  {string} Id - the id of the header field whos filters need reset.
+ */
+function removeOrderPriorityById(Id) {
 	var ori = Filters[Id].Priority;
 
 	Filters[Id].Priority = 0;

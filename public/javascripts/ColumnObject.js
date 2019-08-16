@@ -15,8 +15,9 @@ function ColumnObject(
 	dataId,
 	width,
 	displayHandler,
-	updateCommand,
-	editorType = EditorType.None
+    updateCommand,
+    editorType = EditorType.None,
+    dataBound = true
 ) {
 	this.Number = gridNumber;
 	this.HeaderId = headerId;
@@ -29,7 +30,8 @@ function ColumnObject(
 	this.OrderButtonName = headerId + "order";
 	this.SortButtonName = headerId + "sort";
 	this.HeaderDivName = headerId + "head";
-
+    this.DataBound = dataBound;
+    
 	this.OrderButton = function() {
 		return $("#" + this.OrderButtonName);
 	};

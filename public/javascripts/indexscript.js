@@ -295,7 +295,7 @@ function sortButtonClick() {
 
 		case SortOptions.Descending:
 			Filters[id].Direction = SortOptions.None;
-			removeOrder(id);
+			removeOrderPriorityById(id);
 			break;
 	}
 

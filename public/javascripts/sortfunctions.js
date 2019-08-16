@@ -1,3 +1,6 @@
+import { strict } from "assert";
+import { stringLiteral } from "babel-types";
+
 const SortResult = { SortLeftFirst: -1, SortRightFirst: 1, AreEqual: 0 };
 
 // When the sort() function compares two values, it sends the values to the compare function, and sorts the values according to the returned (negative, zero, positive) value.
@@ -8,9 +11,9 @@ const SortResult = { SortLeftFirst: -1, SortRightFirst: 1, AreEqual: 0 };
 
 /**
  * Sort function for priority column
- * @param  {} s1
- * @param  {} s2
- * @param  {} sortOptions
+ * @param  {string} s1 - first priority field value
+ * @param  {string} s2 - second priority field value
+ * @param  {SortOptions} sortOptions - indicator of sort direction
  */
 function PrioritySort(s1, s2, sortOptions) {
 	console.log(sortOptions);
@@ -48,24 +51,81 @@ function PrioritySort(s1, s2, sortOptions) {
 
 	return SortResult.AreEqual;
 }
-
-function UndefinedStatus(s1, s2, sortOptions) {
+/**
+ * Applied to all sort functions first to look for 'undefined' values
+ * @param  {any} s1 - Object 1 in comparison
+ * @param  {any} s2 - Object 2 in compairosn
+ * @param  {SortOptions} sortOptions - indicator of sort direction
+ * @param  {Boolean} emptyToBottom - whether to sort empty values towards the bottom, false sorts them towards top
+ * @returns SortResult or 5 if neither object is undefined
+ */
+function UndefinedStatus(s1, s2, sortOptions,emptyToBottom) {
 	// if both are undefined they are equal
 	if (typeof s1 == "undefined" && typeof s2 == "undefined") {
-		return 0;
+		return SortResult.AreEqual;
 	}
 	else if (typeof s1 == "undefined" && typeof s2 != "undefined") {
 		// if the first is undefined its less than the second
-		return sortOptions == SortOptions.Descending ? -1 : 1;
+		if (emptyToBottom) return SortResult.SortRightFirst;
+		return sortOptions == SortOptions.Descending ? SortResult.SortRightFirst : 
+		SortResult.SortLeftFirst;
 	}
 	else if (typeof s1 != "undefined" && typeof s2 == "undefined") {
-		return sortOptions == SortOptions.Descending ? 1 : -1;
+		if (emptyToBottom) return SortResult.SortLeftFirst;
+		return sortOptions == SortOptions.Descending ? SortResult.SortLeftFirst : 
+		SortResult.SortRightFirst;
 	}
 	else {
 		// otherwise tell the parent function to skip
 		// this test doesnt apply.
 		return 5;
 	}
+}
+
+/**
+ * Tests whether string is null or empty
+ * @param  {string} s - the string to test
+ * @returns true on null or empty, false otherwise
+ */
+function IsNullOrEmpty(s)
+{
+	return s==null || (typeof s == 'string' && s == String.EmptyString);
+}
+
+/**
+ * Determines whether either of the values are  null or empty strings
+ * @param  {any} s1 - first object to compare
+ * @param  {any} s2 - second object to compare
+ * @param  {SortOptions} sortOptions - sort direction
+ * @param  {boolean} emptyToBottom - should empty values be shifted to bottom ?
+ * @returns SortResult or 5 if not applicable
+ */
+function NullOrEmptyString(s1,s2,sortOptions,emptyToBottom)
+{
+	if (IsNullOrEmpty(s1) && !IsNullOrEmpty(s2))
+	{
+		if (emptyToBottom) return SortResult.SortRightFirst;
+		
+		return sortOptions == SortOptions.Descending ? SortResult.SortRightFirst :
+		SortResult.SortLeftFirst;
+		
+	}
+	else if (!IsNullOrEmpty(s1) && IsNullOrEmpty(s2))
+	{
+		if (emptyToBottom) return SortResult.SortLeftFirst;
+
+		return sortOptions == SortOptions.Descending ? SortResult.SortLeftFirst :
+		SortResult.SortRightFirst;
+	}
+	else if (IsNullOrEmpty(s1) && IsNullOrEmpty(s2))
+	{
+		return SortResult.AreEqual;
+	}
+	else
+	{
+		return 5;
+	}
+	
 }
 
 function CompareTagArrays(tag1, tag2, sortOptions) {
