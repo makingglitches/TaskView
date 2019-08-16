@@ -40,6 +40,7 @@ function Resort() {
 				id: f.Column.DataId,
 				dir: f.Direction,
 				pr: f.Priority,
+				em: f.EmptyToBottom,
 				filter: f
 			});
 		}
@@ -66,26 +67,25 @@ function Resort() {
 			var symbol2 = "d2['" + o.id + "']";
 
 			var symbolstr = symbol1 + "," + symbol2 + "," + o.dir;
+			var emptysymbolstr = symbolstr+','+o.em;
 
-			if (o.filter.Column.Handler == HandlerOptions.Priority) {
-				sortfunctioncode +=
-					"return PrioritySort(" + symbolstr + ");";
-			}
-			else {
+			
 				// causes all kind of errors if you do not check to see whether one or both variables are undefined
 				// first
 				sortfunctioncode +=
-					"var definedCrit=UndefinedStatus(" +
-					symbol1 +
-					"," +
-					symbol2 +
-					"," +
-					o.dir +
-					");";
+					"var definedCrit=UndefinedStatus(" +emptysymbolstr + ");";
 
 				sortfunctioncode +=
 					"if (definedCrit!=5) { return definedCrit;}";
 
+				sortfunctioncode += "definedCrit=NullOrEmptyString("+emptysymbolstr+");";
+				sortfunctioncode += "if (definedCrit!=5) { return definedCrit;}";
+
+				if (o.filter.Column.Handler == HandlerOptions.Priority) {
+					sortfunctioncode +=
+						"return PrioritySort(" + symbolstr + ");";
+				}else 
+				
 				if (o.filter.Column.Handler == HandlerOptions.Tags) {
 					sortfunctioncode +=
 						"return CompareTagArrays(" + symbolstr + ");";
@@ -94,7 +94,7 @@ function Resort() {
 					sortfunctioncode +=
 						"return DefaultCompare(" + symbolstr + ");";
 				}
-			}
+			
 		}
 
 		// close function and add default return value of equal.
