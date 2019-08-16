@@ -1,4 +1,3 @@
-
 /**
  * Constructor for ColumnObject
  * @constructor
@@ -10,22 +9,34 @@
  * @param  {string} updateCommand - the command for updating the task in taskwarrior $i is id ${n} are parameters
  * @param  {string} editorType=EditorType.None - The html editor type handler specified in EditorType
  */
-function ColumnObject(gridNumber,headerId, dataId, width,displayHandler,updateCommand,editorType=EditorType.None)
-{
-    this.Number=gridNumber;
-    this.HeaderId = headerId;	
-    this.DataId=dataId;	
-    this.Width = width;	
-    this.Handler = displayHandler; 
-    this.IsEditable = (editorType!= EditorType.None);
-    this.UpdateCommand = updateCommand;
-    this.Editor = editorType;
-    this.OrderButtonName=headerId+"order";
-    this.SortButtonName=headerId+"sort";
-    this.HeaderDivName=headerId+"head";
+function ColumnObject(
+	gridNumber,
+	headerId,
+	dataId,
+	width,
+	displayHandler,
+	updateCommand,
+	editorType = EditorType.None
+) {
+	this.Number = gridNumber;
+	this.HeaderId = headerId;
+	this.DataId = dataId;
+	this.Width = width;
+	this.Handler = displayHandler;
+	this.IsEditable = editorType != EditorType.None;
+	this.UpdateCommand = updateCommand;
+	this.Editor = editorType;
+	this.OrderButtonName = headerId + "order";
+	this.SortButtonName = headerId + "sort";
+	this.HeaderDivName = headerId + "head";
 
-    this.OrderButton = function () { return $('#'+this.OrderButtonName);}
-    this.SortButton =function () { return $('#'+this.SortButtonName);}
-    this.HeaderDiv = function () { return $('#'+this.HeaderDivName);}
-    
+	this.OrderButton = function() {
+		return $("#" + this.OrderButtonName);
+	};
+	this.SortButton = function() {
+		return $("#" + this.SortButtonName);
+	};
+	this.HeaderDiv = function() {
+		return $("#" + this.HeaderDivName);
+	};
 }

@@ -1,12 +1,10 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-var cmdline = require('child_process');
-
-
+var cmdline = require("child_process");
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.render('helpful');
+router.get("/", function(req, res, next) {
+	res.render("helpful");
 });
 
 module.exports = router;

@@ -7,21 +7,18 @@
  * @param  {boolean} linebreak=true - add a <br> tag ?
  * @returns {JQuery} new image tag inserted in dom
  */
-function addIcon(src,container,id='',linebreak=true)
-{
-  var i =  $('<img>')
-  .attr('id',id)
-  .attr('src',src)
-  .addClass('resizeimage')
-  .appendTo(container);
+function addIcon(src, container, id = "", linebreak = true) {
+	var i = $("<img>")
+		.attr("id", id)
+		.attr("src", src)
+		.addClass("resizeimage")
+		.appendTo(container);
 
-  if (linebreak)
-  {
-    addLineBreak(container);
-  }
-  
-  return i;
+	if (linebreak) {
+		addLineBreak(container);
+	}
 
+	return i;
 }
 /**
  * Adds a checkbox input with a label in a <span> to the selected container
@@ -31,30 +28,23 @@ function addIcon(src,container,id='',linebreak=true)
  * @param  {boolean} linebreak=true - add a <br> tag to end ?
  * @returns {JQuery} toplevel span containing the checkbox and label items.
  */
-function addCheckGroup(name,container,text,linebreak=true)
-{
+function addCheckGroup(name, container, text, linebreak = true) {
+	var contSpan = $("<span/>").attr("id", name + "span").appendTo(container);
 
-  var contSpan = $('<span/>')
-  .attr('id',name+"span")
-  .appendTo(container);
+	$("<input/>")
+		.attr("type", "checkbox")
+		.attr("name", name)
+		.appendTo(contSpan)
+		.val(true);
 
-   $('<input/>')
-  .attr('type','checkbox')
-  .attr('name',name)
-  .appendTo(contSpan).val(true);
+	addTextSpan(text, contSpan);
 
-  addTextSpan(text,contSpan);
+	if (linebreak) {
+		addLineBreak(contSpan);
+	}
 
-  if (linebreak)
-  {
-    addLineBreak(contSpan);
-  }
-
-  return contSpan;
-
+	return contSpan;
 }
-
-
 
 /**
  * Adds a span tag with text
@@ -62,22 +52,16 @@ function addCheckGroup(name,container,text,linebreak=true)
  * @param  {JQuery} container - container selection to add to
  * @param  {} id='' - optional id of span
  */
-function addTextSpan(text,container,id='')
-{
-  $('<span/>')
-  .text(text)
-  .attr('id',id)
-  .appendTo(container);
-
+function addTextSpan(text, container, id = "") {
+	$("<span/>").text(text).attr("id", id).appendTo(container);
 }
 
 /**
  * Simply adds a <br> tag to a container at the end of its present children() array.
  * @param  {JQuery} container - container object selected via jquery
  */
-function addLineBreak(container)
-{
-  $('<br>').appendTo(container);
+function addLineBreak(container) {
+	$("<br>").appendTo(container);
 }
 
 /**
@@ -85,17 +69,19 @@ function addLineBreak(container)
  * @param  {JQuery} container - selected modal div
  * @param  {boolean} show=true - hide or show the div
  */
-function doModal(container, show=true)
-{
-    if (show)
-    {
-        $('#modaldiv').animate({height:"100%",width:'100%',left:"0%",top:"0%"},'slow');
-    }
-    else
-    {
-        $('#modaldiv').animate({height:"0%",width:'0%',left:"50%",top:"50%"},'slow');
-    }
-    
+function doModal(container, show = true) {
+	if (show) {
+		$("#modaldiv").animate(
+			{ height: "100%", width: "100%", left: "0%", top: "0%" },
+			"slow"
+		);
+	}
+	else {
+		$("#modaldiv").animate(
+			{ height: "0%", width: "0%", left: "50%", top: "50%" },
+			"slow"
+		);
+	}
 }
 
 /**
@@ -105,22 +91,20 @@ function doModal(container, show=true)
  * @see columns
  * @returns {JQuery} the new div
  */
-function addColumnHeader(column,container)
-{
-  // add cell header div
- var c =  $('<div/>')
-  .attr('id',column.HeaderDivName)
-  // minus 10 for padding left + right
- // .attr('style','width:'+(column.Width-15)+"px;")
-  .attr('style','grid-column:'+column.Number)
-  //.outerWidth(column.Width)
-  .addClass('cellheader')
-  .html(column.HeaderId)
-  .appendTo(container);
+function addColumnHeader(column, container) {
+	// add cell header div
+	var c = $("<div/>")
+		.attr("id", column.HeaderDivName)
+		// minus 10 for padding left + right
+		// .attr('style','width:'+(column.Width-15)+"px;")
+		.attr("style", "grid-column:" + column.Number)
+		//.outerWidth(column.Width)
+		.addClass("cellheader")
+		.html(column.HeaderId)
+		.appendTo(container);
 
-  return c;
+	return c;
 }
-
 
 /**
  * Adds a sort icon for the column.
@@ -128,16 +112,15 @@ function addColumnHeader(column,container)
  * @param  {JQuery} container - the div to add the button to selected by jquery
  * @returns {JQuery} - the created sort icon
  */
-function addSortIcon(column,container)
-{
-      // add sort icon next to header text
-    var s =   $('<img>')
-      .addClass('resizeimage')
-      .attr('id',column.SortButtonName)
-      .attr('src','images/inactive arrow.png')
-      .attr('data-col',column.HeaderId)
-      .attr('data-dataid',column.DataId)
-      .appendTo(container);
+function addSortIcon(column, container) {
+	// add sort icon next to header text
+	var s = $("<img>")
+		.addClass("resizeimage")
+		.attr("id", column.SortButtonName)
+		.attr("src", "images/inactive arrow.png")
+		.attr("data-col", column.HeaderId)
+		.attr("data-dataid", column.DataId)
+		.appendTo(container);
 
-      return s;
+	return s;
 }
