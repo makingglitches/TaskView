@@ -1,5 +1,3 @@
-import { strict } from "assert";
-import { stringLiteral } from "babel-types";
 
 const SortResult = { SortLeftFirst: -1, SortRightFirst: 1, AreEqual: 0 };
 

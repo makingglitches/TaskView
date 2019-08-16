@@ -3,7 +3,6 @@
 //load this script first
 // convenience object for setting SortOrder field of filter object
 
-
 const SortOptions = { Descending: 1, Ascending: 2, None: 0 };
 // display, search and sort filters
 
@@ -58,52 +57,44 @@ function Resort() {
 			else return 0;
 		});
 
-		var sortfunctioncode =
-			"function gridSort(data) { data.sort(function(d1,d2) {";
+		var sortfunctioncode = 'function gridSort(data) { data.sort(function(d1,d2) {';
 
 		for (o of sortpath) {
 			// get the indexed parameter passed to the sort function
 			var symbol1 = "d1['" + o.id + "']";
 			var symbol2 = "d2['" + o.id + "']";
 
-			var symbolstr = symbol1 + "," + symbol2 + "," + o.dir;
-			var emptysymbolstr = symbolstr+','+o.em;
+			var symbolstr = symbol1 + ',' + symbol2 + ',' + o.dir;
+			var emptysymbolstr = symbolstr + ',' + o.em;
 
-			
-				// causes all kind of errors if you do not check to see whether one or both variables are undefined
-				// first
-				sortfunctioncode +=
-					"var definedCrit=UndefinedStatus(" +emptysymbolstr + ");";
+			// causes all kind of errors if you do not check to see whether one or both variables are undefined
+			// first
 
-				sortfunctioncode +=
-					"if (definedCrit!=5) { return definedCrit;}";
 
-				sortfunctioncode += "definedCrit=NullOrEmptyString("+emptysymbolstr+");";
-				sortfunctioncode += "if (definedCrit!=5) { return definedCrit;}";
+			sortfunctioncode+= MakeSortTest(UndefinedStatus.name,true,emptysymbolstr);
+			sortfunctioncode+= MakeSortTest(NullOrEmptyString.name,true,emptysymbolstr);
 
-				if (o.filter.Column.Handler == HandlerOptions.Priority) {
-					sortfunctioncode +=
-						"return PrioritySort(" + symbolstr + ");";
-				}else 
-				
-				if (o.filter.Column.Handler == HandlerOptions.Tags) {
-					sortfunctioncode +=
-						"return CompareTagArrays(" + symbolstr + ");";
-				}
-				else {
-					sortfunctioncode +=
-						"return DefaultCompare(" + symbolstr + ");";
-				}
-			
+
+			if (o.filter.Column.Handler == HandlerOptions.Priority) {
+
+				sortfunctioncode += MakeSortTest(PrioritySort.name,false, symbolstr );
+			}
+			else if (o.filter.Column.Handler == HandlerOptions.Tags) {
+				sortfunctioncode += MakeSortTest(CompareTagArrays.name,false,symbolstr);
+			}
+			else {
+				sortfunctioncode += MakeSortTest(DefaultCompare.name,false,symbolstr );
+			}
 		}
 
 		// close function and add default return value of equal.
-		sortfunctioncode += "return SortResult.AreEqual; });   }";
+		sortfunctioncode += 'return SortResult.AreEqual; });   }';
 	}
 	else {
-		var sortfunctioncode =
-			'function gridSort(data) { console.log("empty search filters");}';
+		var sortfunctioncode = 'function gridSort(data) { console.log("empty search filters");}';
 	}
+
+	console.log(sortfunctioncode);
 
 	// console.log(sortfunctioncode);
 	eval(sortfunctioncode);
@@ -111,6 +102,14 @@ function Resort() {
 	gridSort(globData);
 
 	// console.log(sortpath);
+}
+
+function MakeSortTest(testName,hasFive,paramStr)
+{
+	var s = 'var '+testName+'result = '+testName+"("+paramStr+");";
+	s +=" if ("+testName+"result != 5 && "+testName+"result != SortResult.AreEqual) return "+testName+"result;"
+
+	return s;
 }
 
 
