@@ -32,6 +32,7 @@ function ColumnObject(
 	this.HeaderDivName = headerId + "head";
     this.DataBound = dataBound;
 	this.DownSortCheckName = "downsort"+headerId+"check";
+	this.HideEmptyCheckName = "hideempty"+headerId+"check";
 	this.FilterIndex = this.HeaderId;
 
 	this.DownSortCheck= function() 

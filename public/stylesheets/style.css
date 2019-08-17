@@ -66,6 +66,12 @@ a {
   background-color: black;
 }
 
+.hidecheckposition
+{
+  position: relative;
+  left:100px;
+}
+
 .loading {
   position: absolute;
   top:50%;

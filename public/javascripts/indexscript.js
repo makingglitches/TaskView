@@ -1,6 +1,5 @@
 
-
-// make sure to include datadefs in html document
+/*********************Initialization code **********************************/
 var globData = [];
 
 $(document).ready(function(err) {
@@ -8,6 +7,8 @@ $(document).ready(function(err) {
 });
 
 $(document).resize(function() {});
+
+/************************************************************************** */
 
 /**
  * Show or hide loading icon
@@ -105,6 +106,9 @@ function setButtonsFromFilters(filter) {
  * @see globData
  */
 function setGrid(data) {
+	
+	showLoad(true);
+	
 	var taskdiv = $("#taskcontainer");
 
 	// clear data and header rows
@@ -135,10 +139,31 @@ function setGrid(data) {
 
 	addOptionPane(taskdiv);
 
+	// build hide list
+
+	var hide=[];
+
+	for (index in Filters)
+	{
+		if (Filters[index].HideEmpty)
+		{
+			hide.push(Filters[index].Column.DataId);
+		}
+	}
+
 	// populate grid with provided data
 	for (item of data) {
 		//  var item = data[id]
 
+		var showthis = true;
+
+		for (i in hide)
+		{
+			if ( EmptyValue(item[hide[i]])) { showthis=false; break;}
+		}
+
+		if (showthis)
+		{
 		resetColumns();
 		var column = nextColumns();
 
@@ -215,6 +240,8 @@ function setGrid(data) {
 					.prop("outerHTML");
 			}
 		});
+
+		}
 	}
 
 	//reset button state from filters
@@ -223,12 +250,17 @@ function setGrid(data) {
 	}
 
 	refreshSortPriorities();
+
+	showLoad(false);
 }
 
 var OptionsPane=null;
 var downSortCheck=null;
 var DownSortOptionsPane=null;
-
+/**
+ * Creates the search options panel
+ * @param  {JQuery} container - container to append the options panel to
+ */
 function addOptionPane(container) {
 
 
@@ -244,7 +276,7 @@ function addOptionPane(container) {
 		"Sort empty values to the bottom ?",
 		Filters[Columns[0].HeaderId].EmptyToBottom,
 		false
-	).children('input');
+	).attr('style','display:inline').children('input');
 
 	$(downSortCheck).change(DownSortChange);
 
@@ -266,15 +298,44 @@ function addOptionPane(container) {
 			column.DownSortCheckName,
 			DownSortOptionsPane,
 			column.HeaderId,
-			Filters[column.HeaderId].EmptyToBottom
-		).children('input');
+			Filters[column.HeaderId].EmptyToBottom,
+			false
+		).attr('style','display:inline').
+		children('input');
 
 		$(check).attr('data-column',column.FilterIndex);
 
-		column = nextColumns();
+	var hidecheck = addCheckGroup(
+		column.HideEmptyCheckName,
+		DownSortOptionsPane,
+		"Hide ?",
+		Filters[column.FilterIndex].HideEmpty,
+		true).attr('style','display:inline;').children('input');
+
+	addLineBreak(DownSortOptionsPane);
+
+	hidecheck.attr('data-id',column.FilterIndex);
+	hidecheck.change(hideCheckChange);
+
+	column = nextColumns();
 	}	
 
 	$(DownSortOptionsPane).hide();
+}
+
+/**
+ * Event handler for hide checkboxes
+ */
+function hideCheckChange()
+{
+	var key = $(this).attr('data-id');
+		
+	Filters[key].HideEmpty = $(this).prop('checked');
+
+	setGrid(globData);
+
+	DownSortOptionsPane.show();
+	
 }
 
 /**
@@ -320,7 +381,9 @@ function refreshSortPriorities() {
 		}
 	}
 }
-
+/**
+ * Downsort gear icon click event
+ */
 function DownSortOptionsClick()
 {
 	if (DownSortOptionsPane.is(':visible'))
@@ -333,7 +396,9 @@ function DownSortOptionsClick()
 	}
 }
 
-
+/**
+ * The change event handler for the master downsort checkbox
+ */
 function DownSortChange()
 {
 	ToggleChangeHandlersCheck(false);
@@ -366,6 +431,7 @@ function DownSortChange()
 	ToggleChangeHandlersCheck(true);
 	Resort(globData);
 }
+
 /**
  * Generic event handler for a single filter checkbox for downsort option
  */
@@ -434,6 +500,7 @@ function AllChecked()
 
 	return checked;
 }
+
 /**
  * Switches changed event on and off on related filters to prevent event cascade
  * @param  {boolean} on - switch the filters on or off ?

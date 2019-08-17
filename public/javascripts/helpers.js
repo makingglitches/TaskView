@@ -1,3 +1,4 @@
+
 /**
  * Add sort icon to the specified container
  * really just seperating these to clean up code
@@ -29,7 +30,9 @@ function addIcon(src, container, id = "", linebreak = true) {
  * @returns {JQuery} toplevel span containing the checkbox and label items.
  */
 function addCheckGroup(name, container, text, initialvalue=false,linebreak = true) {
-	var contSpan = $("<span/>").attr("id", name + "span").appendTo(container);
+	var contSpan = $("<div/>")
+	.attr("id", name + "span")
+	.appendTo(container);
 
 	$("<input/>")
 		.attr("type", "checkbox")
@@ -106,6 +109,16 @@ function addColumnHeader(column, container) {
 		.appendTo(container);
 
 	return c;
+}
+
+
+function EmptyValue(v)
+{
+	if (typeof v == 'undefined') return true;
+	if (v==null) return true;
+	if (typeof v=="string" && v.trim()=="") return true;
+	
+	return false;
 }
 
 /**
