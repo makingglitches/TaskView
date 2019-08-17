@@ -31,7 +31,14 @@ function ColumnObject(
 	this.SortButtonName = headerId + "sort";
 	this.HeaderDivName = headerId + "head";
     this.DataBound = dataBound;
-    
+	this.DownSortCheckName = "downsort"+headerId+"check";
+	this.FilterIndex = this.HeaderId;
+
+	this.DownSortCheck= function() 
+	{
+		return $('#'+this.DownSortCheckName);
+	}
+	
 	this.OrderButton = function() {
 		return $("#" + this.OrderButtonName);
 	};
@@ -41,4 +48,5 @@ function ColumnObject(
 	this.HeaderDiv = function() {
 		return $("#" + this.HeaderDivName);
 	};
+	
 }

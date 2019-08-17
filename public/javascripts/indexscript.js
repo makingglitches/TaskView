@@ -1,3 +1,5 @@
+
+
 // make sure to include datadefs in html document
 var globData = [];
 
@@ -223,15 +225,38 @@ function setGrid(data) {
 	refreshSortPriorities();
 }
 
-function addOptionPane(container) {
-	$("<div/>")
-		.attr("id", "searchoptionspane")
-		.attr("style", "grid-column-start:span " + Columns.length + ";")
-		.addClass("border")
-		.addClass("optionspane")
-		.appendTo(container);
 
-	var pane = $("#searchoptionspane");
+function UpdateIntermediate(downsortcheck)
+{
+	var inter=false;
+	var all=true;
+
+	for (i in Filters)
+	{
+		inter = inter || Filters[i].EmptyToBottom;
+		all = all && Filters[i].EmptyToBottoml;
+	}
+
+	// must drive from smaller check changed events
+	if (all)
+	{
+		downsortcheck.prop("indeterminate", false);
+		downsortcheck.prop("checked",true);
+	}
+	else
+	{
+		downsortcheck.prop("indeterminate",inter);
+		downsortcheck.prop('checked',false);
+	}
+
+}
+
+
+function addOptionPane(container) {
+
+
+	var pane = SpanAllColumns( addDiv("searchoptionspane",container))
+	.addClass("border").addClass("optionspane");
 
 	//TODO: add 3 state master, color code the box grey when other values are selected but not all
 	// on clicking while grey change all values to true.
@@ -244,54 +269,67 @@ function addOptionPane(container) {
 		false
 	);
 
-	var downsortcheck = $(checkgroup).children('input');
+	var downsortcheck = 
+	$(checkgroup).children('input');
 
 	$(downsortcheck).change(function()
 	{
-		for ( i in Filters)
+		if (this.prop("indeterminate"))
 		{
-			Filters[i].EmptyToBottom = $(this).prop('checked');
+
 		}
+		
 
 	});
 
 	var icon = addIcon("/images/settings.png", pane, "downsortoptions", false);
 
 	icon.attr("style", "margin-left:5px;padding-left:0px;");
+	icon.click(DownSortOptionsClick);
 
 	// create the hidden div that contains specific checkboxes for each column and an all
 	var downopts = addDiv("forwhichdownsortdiv",pane).attr("style", "padding-left:10px");
 	
-	// create check-all checkbox.
-	var checkall = addCheckGroup("downsortallcheck", 
-	downopts, 
-	Filters[Columns[0].HeaderId].EmptyToBottom,
-	"All", 
+	// // create check-all checkbox.
+	// var checkall = addCheckGroup("downsortallcheck", 
+	// downopts, 
+	// Filters[Columns[0].HeaderId].EmptyToBottom,
+	// "All", 
 	
-	false).children('input');
+	// false).children('input');
 
-	$(checkall).val();
+	// $(checkall).val();
 
-	$(checkall).change(function()
-	{
-		for ( i in Filters)
-		{
-			Filters[i].EmptyToBottom = $(this).prop('checked');
-		}
+	// $(checkall).change(function()
+	// {
+	// 	for ( i in Filters)
+	// 	{
+	// 		Filters[i].EmptyToBottom = $(this).prop('checked');
+	// 	}
 
-	});
+	// });
 
 	resetColumns();
 
 	var column = nextColumns();
 
 	while (column != null) {
-		addCheckGroup(
-			"downsort" + column.HeaderId + "check",
+		 addCheckGroup(
+			column.DownSortCheckName,
 			downopts,
 			column.HeaderId,
 			Filters[column.HeaderId].EmptyToBottom
 		);
+
+		var check = column.DownSortCheck();
+
+		check.attr('data-column',column.FilterId);
+		check.change(function()
+		{
+			   var key = $(this).attr('data-column');
+			   Filters[key].EmptyToBottom= $(this).prop('checked');
+		});
+
 		column = nextColumns();
 	}
 
@@ -340,4 +378,9 @@ function refreshSortPriorities() {
 			$("#" + f.Column.OrderButtonName).text(f.Priority);
 		}
 	}
+}
+
+function DownSortOptionsClick()
+{
+
 }
