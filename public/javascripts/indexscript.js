@@ -225,115 +225,56 @@ function setGrid(data) {
 	refreshSortPriorities();
 }
 
-
-function UpdateIntermediate(downsortcheck)
-{
-	var inter=false;
-	var all=true;
-
-	for (i in Filters)
-	{
-		inter = inter || Filters[i].EmptyToBottom;
-		all = all && Filters[i].EmptyToBottoml;
-	}
-
-	// must drive from smaller check changed events
-	if (all)
-	{
-		downsortcheck.prop("indeterminate", false);
-		downsortcheck.prop("checked",true);
-	}
-	else
-	{
-		downsortcheck.prop("indeterminate",inter);
-		downsortcheck.prop('checked',false);
-	}
-
-}
-
+var OptionsPane=null;
+var downSortCheck=null;
+var DownSortOptionsPane=null;
 
 function addOptionPane(container) {
 
 
-	var pane = SpanAllColumns( addDiv("searchoptionspane",container))
+	OptionsPane = SpanAllColumns( addDiv("searchoptionspane",container))
 	.addClass("border").addClass("optionspane");
 
 	//TODO: add 3 state master, color code the box grey when other values are selected but not all
 	// on clicking while grey change all values to true.
 	// create checkbox group for downsorting all empty values, add gear icon for later.
-	var checkgroup = addCheckGroup(
-		"downsortempty",
-		pane,
+	 downSortCheck = addCheckGroup(
+		"DownSortMaster",
+		OptionsPane,
 		"Sort empty values to the bottom ?",
 		Filters[Columns[0].HeaderId].EmptyToBottom,
 		false
-	);
+	).children('input');
 
-	var downsortcheck = 
-	$(checkgroup).children('input');
+	$(downSortCheck).change(DownSortChange);
 
-	$(downsortcheck).change(function()
-	{
-		if (this.prop("indeterminate"))
-		{
+	// add settings icon
+	var settingsIcon = addIcon("/images/settings.png", OptionsPane, "downsortoptions", false);
 
-		}
-		
-
-	});
-
-	var icon = addIcon("/images/settings.png", pane, "downsortoptions", false);
-
-	icon.attr("style", "margin-left:5px;padding-left:0px;");
-	icon.click(DownSortOptionsClick);
+	settingsIcon.attr("style", "margin-left:5px;padding-left:0px;");
+	settingsIcon.click(DownSortOptionsClick);
 
 	// create the hidden div that contains specific checkboxes for each column and an all
-	var downopts = addDiv("forwhichdownsortdiv",pane).attr("style", "padding-left:10px");
+	DownSortOptionsPane = addDiv("forwhichdownsortdiv",OptionsPane).attr("style", "padding-left:10px");
 	
-	// // create check-all checkbox.
-	// var checkall = addCheckGroup("downsortallcheck", 
-	// downopts, 
-	// Filters[Columns[0].HeaderId].EmptyToBottom,
-	// "All", 
-	
-	// false).children('input');
-
-	// $(checkall).val();
-
-	// $(checkall).change(function()
-	// {
-	// 	for ( i in Filters)
-	// 	{
-	// 		Filters[i].EmptyToBottom = $(this).prop('checked');
-	// 	}
-
-	// });
-
 	resetColumns();
 
 	var column = nextColumns();
 
 	while (column != null) {
-		 addCheckGroup(
+	var check=	 addCheckGroup(
 			column.DownSortCheckName,
-			downopts,
+			DownSortOptionsPane,
 			column.HeaderId,
 			Filters[column.HeaderId].EmptyToBottom
-		);
+		).children('input');
 
-		var check = column.DownSortCheck();
-
-		check.attr('data-column',column.FilterId);
-		check.change(function()
-		{
-			   var key = $(this).attr('data-column');
-			   Filters[key].EmptyToBottom= $(this).prop('checked');
-		});
+		$(check).attr('data-column',column.FilterIndex);
 
 		column = nextColumns();
-	}
+	}	
 
-	$(downopts).hide();
+	$(DownSortOptionsPane).hide();
 }
 
 /**
@@ -382,5 +323,152 @@ function refreshSortPriorities() {
 
 function DownSortOptionsClick()
 {
+	if (DownSortOptionsPane.is(':visible'))
+	{
+		DownSortOptionsPane.fadeOut();
+	}
+	else
+	{
+		DownSortOptionsPane.fadeIn();
+	}
+}
 
+
+function DownSortChange()
+{
+	ToggleChangeHandlersCheck(false);
+
+	if ($(this).prop('indeterminate')|| $(this).prop('checked'))
+	{
+		// either some of the filters are checked or all of them are now supposed to be.
+		$(this).prop('indeterminate',false);
+		$(this).prop('checked',true);
+
+		for (i in Filters)
+		{
+			console.log(i);
+			var check = Filters[i].Column.DownSortCheck();
+			check.prop('checked',true);
+			Filters[i].EmptyToBottom = true;
+		}
+	}
+	else 
+	{
+		// else its now not checked, update all the others accordingly
+		for (i in Filters)
+		{
+			var check = Filters[i].Column.DownSortCheck();
+			check.prop('checked',false);
+			Filters[i].EmptyToBottom = false;
+		}
+	}
+	
+	ToggleChangeHandlersCheck(true);
+	Resort(globData);
+}
+/**
+ * Generic event handler for a single filter checkbox for downsort option
+ */
+function DownSortFilterChange()
+{
+	
+	var key = $(this).attr('data-column');
+			   Filters[key].EmptyToBottom= $(this).prop('checked');
+
+	console.log(key);
+
+	var filter = Filters[key];
+	
+	// update the filter
+	filter.EmptyToBottom = $(this).prop('checked');
+
+	ToggleChangeHandlersCheck(false);
+
+	if (AnyChecked() && !AllChecked())
+	{
+		downSortCheck.prop('indeterminate',true);
+		downSortCheck.prop('checked',false);
+	}
+	else if (AllChecked())
+	{
+		downSortCheck.prop('indeterminate',false);
+		downSortCheck.prop('checked',true);
+	}
+	else
+	{
+		// none have been checked
+		downSortCheck.prop('indeterminate',false);
+		downSortCheck.prop('checked',false);		
+	}
+
+	ToggleChangeHandlersCheck(true);
+	Resort(globData);
+}
+
+/**
+ * Are any of the downsort filters checked ?
+ */
+function AnyChecked()
+{
+	var checked = false;
+
+	for (i in Filters)
+	{
+		checked = checked || Filters[i].Column.DownSortCheck().prop('checked');
+	}
+
+	return checked;
+}
+
+/**
+ * Are all the column downsort empty inputs checked ?
+ */
+function AllChecked()
+{
+	var checked = true;
+
+	for (i in Filters)
+	{
+		checked = checked && Filters[i].Column.DownSortCheck().prop('checked');
+	}
+
+	return checked;
+}
+/**
+ * Switches changed event on and off on related filters to prevent event cascade
+ * @param  {boolean} on - switch the filters on or off ?
+ */
+function ToggleChangeHandlersCheck(on)
+{
+
+	resetColumns();
+
+	var column = nextColumns();
+
+	if (on)
+	{
+		downSortCheck.change(DownSortChange);
+	}
+	else
+	{
+		downSortCheck.unbind('change');
+	}
+
+	while (column !=null)
+	{
+
+		var check = column.DownSortCheck();
+
+		if (on)
+		{
+			check.change(DownSortFilterChange);
+		}
+		else
+		{
+			check.unbind('change');
+		}
+
+		column = nextColumns();
+	}
+	
 }

@@ -127,6 +127,13 @@ function addSortIcon(column, container) {
 	return s;
 }
 
+
+/**
+ * Add a div to the container
+ * @param  {string} id - the id of the new div
+ * @param  {JQuery} container - the container to append it to.
+ * @returns {JQuery} returns the newly created div
+ */
 function addDiv(id,container)
 {
 	var d = $("<div>")
@@ -135,6 +142,10 @@ function addDiv(id,container)
 	return d;
 }
 
+/**
+ * Modify style of div to span entire grid
+ * @param  {JQuery} container - container to apply style to.
+ */
 function SpanAllColumns(container)
 {
 	return container.

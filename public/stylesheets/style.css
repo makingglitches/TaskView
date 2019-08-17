@@ -59,7 +59,7 @@ a {
 
 
 .optionspane {
-  height:20px; 
+  min-height: 20px;
   position:sticky;
   z-index: 3;
   top:73px;
