@@ -162,9 +162,33 @@ function CompareTagArrays(tag1, tag2, sortOptions) {
 	return comp;
 }
 
+function StatusCompare(s1,s2,sortOptions)
+{
+	var comp1 = 
+	s1=="pending" ? 1 :2;
+
+	var comp2 =
+	s2=="pending" ? 1:2;
+
+	if (comp1 > comp2)
+	{
+		return sortOptions == SortOptions.Descending ?
+		SortResult.SortLeftFirst : SortResult.SortRightFirst;
+	}
+
+	if (comp1 < comp2)
+	{
+		return sortOptions == SortOptions.Descending ?
+		SortResult.SortLeftFirst : SortResult.SortRightFirst;
+	}
+
+	return SortResult.AreEqual;
+	
+}
+
 function CompareStrings(s1, s2, sortOptions) {
 	var comp1 = s1.toLowerCase();
-	var comp2 = s1.toLowerCase();
+	var comp2 = s2.toLowerCase();
 
 	if (comp1 > comp2) {
 		return sortOptions == SortOptions.Descending
@@ -180,7 +204,8 @@ function CompareStrings(s1, s2, sortOptions) {
 	return SortResult.AreEqual;
 }
 
-function DefaultCompare(s1, s2, sortOptions) {
+function DefaultCompare(s1, s2, sortOptions) 
+{
 	if (typeof s1 == "string" || typeof s2 == "string") {
 		return CompareStrings(s1 + "", s2 + "", sortOptions);
 	}

@@ -1,4 +1,4 @@
-const HandlerOptions = { Priority: "Priority", Tags: "Tags", None: "" };
+const HandlerOptions = { Priority: "Priority", Tags: "Tags", Status:"Status",None: "" };
 
 const EditorType = {
 	TextArea: "TextArea",

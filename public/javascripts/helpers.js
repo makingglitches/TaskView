@@ -28,14 +28,16 @@ function addIcon(src, container, id = "", linebreak = true) {
  * @param  {boolean} linebreak=true - add a <br> tag to end ?
  * @returns {JQuery} toplevel span containing the checkbox and label items.
  */
-function addCheckGroup(name, container, text, linebreak = true) {
+function addCheckGroup(name, container, text, initialvalue=false,linebreak = true) {
 	var contSpan = $("<span/>").attr("id", name + "span").appendTo(container);
 
 	$("<input/>")
 		.attr("type", "checkbox")
-		.attr("name", name)
+		.attr("id", name)
+		.attr('name',name)
 		.appendTo(contSpan)
-		.val(true);
+		.prop('checked',initialvalue);
+		
 
 	addTextSpan(text, contSpan);
 
@@ -123,4 +125,12 @@ function addSortIcon(column, container) {
 		.appendTo(container);
 
 	return s;
+}
+
+function addDiv(id,container)
+{
+	var d = $("<div>")
+	.attr('id',id)
+	.appendTo(container);
+	return d;
 }

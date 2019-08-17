@@ -70,20 +70,20 @@ function Resort() {
 			// causes all kind of errors if you do not check to see whether one or both variables are undefined
 			// first
 
-
-			sortfunctioncode+= MakeSortTest(UndefinedStatus.name,true,emptysymbolstr);
-			sortfunctioncode+= MakeSortTest(NullOrEmptyString.name,true,emptysymbolstr);
-
+			sortfunctioncode += MakeSortTest(UndefinedStatus.name, true, emptysymbolstr);
+			sortfunctioncode += MakeSortTest(NullOrEmptyString.name, true, emptysymbolstr);
 
 			if (o.filter.Column.Handler == HandlerOptions.Priority) {
-
-				sortfunctioncode += MakeSortTest(PrioritySort.name,false, symbolstr );
+				sortfunctioncode += MakeSortTest(PrioritySort.name, false, symbolstr);
 			}
 			else if (o.filter.Column.Handler == HandlerOptions.Tags) {
-				sortfunctioncode += MakeSortTest(CompareTagArrays.name,false,symbolstr);
+				sortfunctioncode += MakeSortTest(CompareTagArrays.name, false, symbolstr);
+			}
+			else if (o.filter.Column.Handler == HandlerOptions.Status) {
+				sortfunctioncode += MakeSortTest(StatusCompare.name, false, symbolstr);
 			}
 			else {
-				sortfunctioncode += MakeSortTest(DefaultCompare.name,false,symbolstr );
+				sortfunctioncode += MakeSortTest(DefaultCompare.name, false, symbolstr);
 			}
 		}
 
@@ -104,14 +104,19 @@ function Resort() {
 	// console.log(sortpath);
 }
 
-function MakeSortTest(testName,hasFive,paramStr)
-{
-	var s = 'var '+testName+'result = '+testName+"("+paramStr+");";
-	s +=" if ("+testName+"result != 5 && "+testName+"result != SortResult.AreEqual) return "+testName+"result;"
+function MakeSortTest(testName, hasFive, paramStr) {
+	var s = 'var ' + testName + 'result = ' + testName + '(' + paramStr + ');';
+	s +=
+		' if (' +
+		testName +
+		'result != 5 && ' +
+		testName +
+		'result != SortResult.AreEqual) return ' +
+		testName +
+		'result;';
 
 	return s;
 }
-
 
 /**
  * Updates the filters resetting priority of id and adjusting the others

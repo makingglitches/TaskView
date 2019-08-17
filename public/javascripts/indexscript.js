@@ -233,30 +233,53 @@ function addOptionPane(container) {
 
 	var pane = $("#searchoptionspane");
 
-	// $('<img>')
-	// .attr('id','expandoptionsbutton')
-	// .attr('src','/images/expand.png')
-	// .addClass('resizeimage')
-	// .appendTo(pane);
-
-	addCheckGroup(
+	//TODO: add 3 state master, color code the box grey when other values are selected but not all
+	// on clicking while grey change all values to true.
+	// create checkbox group for downsorting all empty values, add gear icon for later.
+	var checkgroup = addCheckGroup(
 		"downsortempty",
 		pane,
 		"Sort empty values to the bottom ?",
+		Filters[Columns[0].HeaderId].EmptyToBottom,
 		false
 	);
+
+	var downsortcheck = $(checkgroup).children('input');
+
+	$(downsortcheck).change(function()
+	{
+		for ( i in Filters)
+		{
+			Filters[i].EmptyToBottom = $(this).prop('checked');
+		}
+
+	});
+
 	var icon = addIcon("/images/settings.png", pane, "downsortoptions", false);
 
 	icon.attr("style", "margin-left:5px;padding-left:0px;");
 
-	$("<div>/")
-		.attr("id", "forwhichdownsortdiv")
-		.attr("style", "padding-left:10px")
-		.appendTo(pane);
+	// create the hidden div that contains specific checkboxes for each column and an all
+	var downopts = addDiv("forwhichdownsortdiv",pane).attr("style", "padding-left:10px");
+	
+	// create check-all checkbox.
+	var checkall = addCheckGroup("downsortallcheck", 
+	downopts, 
+	Filters[Columns[0].HeaderId].EmptyToBottom,
+	"All", 
+	
+	false).children('input');
 
-	var downopts = $("#forwhichdownsortdiv");
+	$(checkall).val();
 
-	addCheckGroup("downsortallcheck", downopts, "All", false);
+	$(checkall).change(function()
+	{
+		for ( i in Filters)
+		{
+			Filters[i].EmptyToBottom = $(this).prop('checked');
+		}
+
+	});
 
 	resetColumns();
 
@@ -266,7 +289,8 @@ function addOptionPane(container) {
 		addCheckGroup(
 			"downsort" + column.HeaderId + "check",
 			downopts,
-			column.HeaderId
+			column.HeaderId,
+			Filters[column.HeaderId].EmptyToBottom
 		);
 		column = nextColumns();
 	}
