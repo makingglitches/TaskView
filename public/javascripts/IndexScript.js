@@ -114,12 +114,6 @@ function setGrid(data) {
 	// clear data and header rows
 	taskdiv.children().remove("div");
 
-	// var headercont = $('<div>')
-	//                  .attr('id','headerdiv')
-	//                  .attr('style',"grid-column-start:span "+ countColumns()+
-	//                  "; position:sticky; top:0;  grid-row-start:span 2")
-	//                  .appendTo(t);
-
 	setContainerProps("taskcontainer");
 
 	// set up headers and links
@@ -210,11 +204,6 @@ function setGrid(data) {
 					break;
 			}
 
-			//  if (column.Handler==HandlerOptions.Tags)
-			//  {
-			//   console.log(datapiece);
-			//  }
-
 			$("<div>")
 				.attr("data-uuid", item.uuid)
 				.attr("data-id", column.HeaderId)
@@ -287,30 +276,38 @@ function addOptionPane(container) {
 	settingsIcon.click(DownSortOptionsClick);
 
 	// create the hidden div that contains specific checkboxes for each column and an all
-	DownSortOptionsPane = addDiv("forwhichdownsortdiv",OptionsPane).attr("style", "padding-left:10px");
+	DownSortOptionsPane = addDiv("forwhichdownsortdiv",OptionsPane).addClass('sortopstable');
 	
 	resetColumns();
 
 	var column = nextColumns();
 
 	while (column != null) {
+	
+	var row = addDiv( "",DownSortOptionsPane).addClass("sortopsrow");
+
 	var check=	 addCheckGroup(
 			column.DownSortCheckName,
-			DownSortOptionsPane,
+			row,
 			column.HeaderId,
 			Filters[column.HeaderId].EmptyToBottom,
 			false
-		).attr('style','display:inline').
-		children('input');
+		)
+		.addClass("sortopsdata")
+		//.attr('style','display:inline')
+		.children('input');
 
 		$(check).attr('data-column',column.FilterIndex);
 
 	var hidecheck = addCheckGroup(
 		column.HideEmptyCheckName,
-		DownSortOptionsPane,
+		row,
 		"Hide ?",
 		Filters[column.FilterIndex].HideEmpty,
-		true).attr('style','display:inline;').children('input');
+		true)
+		.addClass('sortopsdata')
+		//.attr('style','display:inline;')
+		.children('input');
 
 	addLineBreak(DownSortOptionsPane);
 

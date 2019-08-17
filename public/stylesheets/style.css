@@ -103,6 +103,23 @@ a {
   z-index:3; 
 }
 
+.sortopstable
+{
+  display:table;
+  padding-left: 10px;
+}
+
+.sortopsrow
+{
+  display: table-row
+}
+
+.sortopsdata
+{
+  display: table-cell;
+  padding-left:3px;
+}
+
 
 .invertrotate
 {
