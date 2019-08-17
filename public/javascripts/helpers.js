@@ -134,3 +134,9 @@ function addDiv(id,container)
 	.appendTo(container);
 	return d;
 }
+
+function SpanAllColumns(container)
+{
+	return container.
+	attr('style',"grid-column-start:span "+Columns.length+";");
+}
